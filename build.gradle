@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+//    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+def localRepositoryPath = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+
+subprojects {
+    group = 'jyx'
+    version = '0.0.1'
+
+    apply plugin: 'maven'
+//    apply plugin: 'io.spring.dependency-management'
+//    apply plugin: 'java-library'
+
+    repositories {
+        mavenCentral()
+    }
+
+//    dependencyManagement {
+//        imports {
+////            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+//            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
+//        }
+//    }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    uploadArchives {
+        repositories {
+            //mavenDeployer 需要依赖 apply plugin: 'maven'
+            mavenDeployer   {
+                repository(url: localRepositoryPath)
+                pom.project {
+                    name = project.name
+                    version = project.version
+                    groupId = project.group
+                }
+            }
+        }
+    }
+}

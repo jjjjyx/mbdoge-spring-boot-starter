@@ -1,0 +1,7 @@
+rootProject.name = 'jyx-spring-boot-starter'
+
+include 'jyx-common'
+include 'jyx-web-api'
+include 'jyx-web-jwt'
+include 'example'
+
