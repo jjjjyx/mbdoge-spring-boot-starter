@@ -41,8 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
         properties = {
                 "logging.level.cn.mbdoge.jyx.web.handler=trace",
-//                "spring.servlet.multipart.maxFileSize=128KB",
-//                "spring.servlet.multipart.maxRequestSize=128KB",
+                "mbdoge.api.encrypt.enabled=false"
         }
 )
 @AutoConfigureMockMvc
@@ -449,6 +448,7 @@ public class ControllerHandlerAdviceTest {
 
         Assertions.assertTrue(mvcResult.getResolvedException() != null, "参数类型不正确");
     }
+
 
     private ResultActions encode (ResultActions perform) {
         perform.andReturn().getResponse().setCharacterEncoding("UTF-8");

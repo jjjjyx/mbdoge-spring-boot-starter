@@ -1,4 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.mbdoge.jyx.web.api.ApiConfigure,\
-cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice,\
-cn.mbdoge.jyx.web.encrypt.EncodeResponseBodyAdvice
+cn.mbdoge.jyx.web.api.WebApiAutoConfigure

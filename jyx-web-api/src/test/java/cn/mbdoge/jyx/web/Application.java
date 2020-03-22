@@ -3,6 +3,7 @@ package cn.mbdoge.jyx.web;
 import cn.mbdoge.jyx.exception.LocalServiceException;
 import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
 import cn.mbdoge.jyx.web.handler.ControllerHandlerAdviceTest;
+import cn.mbdoge.jyx.web.tomcat.WebServerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.MessageSourceAccessor;
 
@@ -91,6 +94,9 @@ public class Application implements CommandLineRunner {
 //        throw new IOException("xx");
         return m;
     }
+
+
+
 
     /**
      * 测试ResponseBody
@@ -192,7 +198,11 @@ public class Application implements CommandLineRunner {
         SpringApplication.run(Application.class, args);
     }
 
-
+    @Bean
+    public ConfigurableServletWebServerFactory webServerFactory() {
+        return new WebServerFactory();
+    }
+//
     @Override
     public void run(String... args) throws Exception {
     }

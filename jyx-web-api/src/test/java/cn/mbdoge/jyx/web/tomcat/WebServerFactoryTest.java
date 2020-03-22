@@ -1,9 +1,6 @@
-package cn.mbdoge.jyx.web.encrypt;
+package cn.mbdoge.jyx.web.tomcat;
 
-
-import cn.mbdoge.jyx.encrypt.AesEncrypt;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,45 +11,41 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(
         properties = {
                 "logging.level.cn.mbdoge.jyx.web.handler=trace",
-                "mbdoge.api.encrypt.enabled=true"
+                "mbdoge.api.encrypt.enabled=false"
         }
 )
 @AutoConfigureMockMvc
-class EncodeResponseBodyAdviceTest {
+public class WebServerFactoryTest {
     @Autowired
     private MockMvc mockMvc; //只需 autowire
-    @Autowired
-    private ApiEncryptProperties properties;
 
-    @BeforeEach
-    void setUp() {
-    }
-
+    /**
+     * 这个 ?a[]=xx 这种参数形式测试不出来
+     * 需要在启动的tomcat 上发起请求
+     * @throws Exception
+     */
     @Test
     void name() throws Exception {
+
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
-                        .get("/input2");
+                        .get("/input2?a[]=xx");
 
         mockHttpServletRequestBuilder.param("test", "xxx");
 //        mockHttpServletRequestBuilder.param("aa[]", "xxx");
-        String contentAsString = mockMvc.perform(mockHttpServletRequestBuilder)
-                .andDo(print())
+        MvcResult xxx = mockMvc.perform(mockHttpServletRequestBuilder)
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
-                .andReturn().getResponse().getContentAsString();
-//        String decrypt = AesEncrypt.decrypt(contentAsString, properties.getSecret());
-
-        Assertions.assertNotNull(contentAsString);
-        Assertions.assertTrue(contentAsString.startsWith("\""));
-        Assertions.assertTrue(contentAsString.endsWith("\""));
-//        System.out.println("decrypt = " + decrypt);
-
+                .andExpect(MockMvcResultMatchers.jsonPath("$.d").value("xxx"))
+                .andReturn();
+        Assertions.assertNull(xxx.getResolvedException());
     }
 }

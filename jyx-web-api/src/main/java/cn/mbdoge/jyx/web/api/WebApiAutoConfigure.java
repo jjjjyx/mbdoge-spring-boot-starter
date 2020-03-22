@@ -1,49 +1,60 @@
 package cn.mbdoge.jyx.web.api;
 
 
+import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
+import cn.mbdoge.jyx.web.encrypt.EncodeResponseBodyAdvice;
 import cn.mbdoge.jyx.web.language.ApiMessageProperties;
 import cn.mbdoge.jyx.web.language.SmartLocaleResolver;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.core.Ordered;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
-import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.annotation.PostConstruct;
+import javax.servlet.Servlet;
+import java.util.*;
 
 /**
  * 主要是做一些常用的全局配置，减少重复的代码
  * @author jyx
  */
 @Slf4j
-@EnableConfigurationProperties(ApiMessageProperties.class)
-@Configuration
-public class ApiConfigure implements WebMvcConfigurer {
+@Configuration(proxyBeanMethods =false)
+@EnableConfigurationProperties({ApiMessageProperties.class, ApiEncryptProperties.class})
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+@AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
+public class WebApiAutoConfigure {
 
-    @Autowired
-    private ApiMessageProperties apiMessageProperties;
+    private final ApiMessageProperties apiMessageProperties;
 
-    /**
-     * 配置默认的网页编码为 utf-8
-     * @param converters
-     */
-    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        converters.add(new StringHttpMessageConverter(StandardCharsets.UTF_8));
+    public WebApiAutoConfigure(ApiMessageProperties apiMessageProperties) {
+        this.apiMessageProperties = apiMessageProperties;
+//        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
+//        System.out.println("requestMappingHandlerAdapter = " + requestMappingHandlerAdapter);
+
+//        requestMappingHandlerAdapter.setResponseBodyAdvice(Collections.singletonList(encodeResponseBodyAdvice()));
+//        requestMappingHandlerAdapter.afterPropertiesSet();
     }
+
 
     /**
      * 配置api的 多语言
@@ -101,6 +112,25 @@ public class ApiConfigure implements WebMvcConfigurer {
         bean.setValidationPropertyMap(map);
         return bean;
     }
+
+
+
+//    @ConditionalOnProperty(prefix = "mbdoge.api.encrypt",value = "enabled",havingValue = "true")
+    @PostConstruct
+    public void init () {
+
+//        requestMappingHandlerAdapter.afterPropertiesSet();
+//        requestMappingHandlerAdapter.setResponseBodyAdvice( Collections.singletonList(encodeResponseBodyAdvice()));
+    }
+
+//    @ControllerAdvice
+//    @ConditionalOnProperty(prefix = "mbdoge.api.encrypt",value = "enabled",havingValue = "true")
+//    public static class WebEncodeResponseBodyAdvice extends EncodeResponseBodyAdvice {
+//        public WebEncodeResponseBodyAdvice(ApiEncryptProperties properties, ObjectMapper objectMapper) {
+//            super(properties, objectMapper);
+//        }
+//    }
+
 
 // 需要在 应用类注册，这里注册会报 beans 重复错误 ，暂时没有解决办法
 //    @Bean

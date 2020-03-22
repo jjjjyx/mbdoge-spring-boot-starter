@@ -1,15 +1,11 @@
 package cn.mbdoge.jyx.web.handler;
 
 import cn.mbdoge.jyx.exception.LocalServiceException;
-import cn.mbdoge.jyx.web.api.ApiConfigure;
 import cn.mbdoge.jyx.web.model.RespResult;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -28,16 +24,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.ValidationException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -45,17 +36,16 @@ import java.util.Set;
  *  spring.mvc.throw-exception-if-no-handler-found=true
  * 需要配置这个选项
  */
-@ControllerAdvice
-@ResponseBody
 @Slf4j
 @ConditionalOnClass(MessageSourceAccessor.class)
+@ControllerAdvice
+@ResponseBody
 public class ControllerHandlerAdvice {
 
     protected final MessageSourceAccessor messageSourceAccessor;
 
     public ControllerHandlerAdvice(@Qualifier("apiMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor) {
         this.messageSourceAccessor = messageSourceAccessor;
-        System.out.println("messageSourceAccessor = " + messageSourceAccessor);
     }
 
     /**

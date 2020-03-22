@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServerHttpRequest;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = "mbdoge.api.encrypt",value = "enabled",havingValue = "true")
 @ControllerAdvice
+@Order(1)
 public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     private final ApiEncryptProperties properties;
