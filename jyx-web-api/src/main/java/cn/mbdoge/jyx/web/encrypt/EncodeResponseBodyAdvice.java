@@ -1,7 +1,6 @@
 package cn.mbdoge.jyx.web.encrypt;
 
 import cn.mbdoge.jyx.encrypt.AesEncrypt;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
@@ -26,14 +25,12 @@ import javax.servlet.http.HttpServletRequest;
 @Order(1)
 public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
-    private final ApiEncryptProperties properties;
-    private final ObjectMapper objectMapper;
+    private final ApiEncrypt apiEncrypt;
 
-    public EncodeResponseBodyAdvice(ApiEncryptProperties properties, ObjectMapper objectMapper) {
-        this.properties = properties;
-//        this.properties = properties;
-        this.objectMapper = objectMapper;
+    public EncodeResponseBodyAdvice(ApiEncrypt apiEncrypt) {
+        this.apiEncrypt = apiEncrypt;
     }
+
 
     public boolean supports(MethodParameter returnType, Class converterType) {
         return true;
@@ -44,22 +41,16 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         ServletServerHttpRequest temp = (ServletServerHttpRequest) srequest;
         HttpServletRequest req = temp.getServletRequest();
 
-        try {
-            if (selectedContentType.equals(MediaType.APPLICATION_JSON)) {
-                Object obj = body;
-                if (obj instanceof MappingJacksonValue) {
-                    obj = ((MappingJacksonValue) obj).getValue();
-                }
-                log.trace("对方法 api 请求 = {} 返回的数据进行加密", req.getServletPath());
-                String json = objectMapper.writeValueAsString(obj);
-                return AesEncrypt.encrypt(json, properties.getSecret());
-            } else {
-                return body;
+        if (selectedContentType.equals(MediaType.APPLICATION_JSON)) {
+            Object obj = body;
+            if (obj instanceof MappingJacksonValue) {
+                obj = ((MappingJacksonValue) obj).getValue();
             }
-        } catch (Exception e) {
-            log.trace("body = {} 对方法 api = {}返回数据进行加密失败 返回空数据", body, req.getServletPath(), e);
-            return "";
-        }
+            log.trace("对方法 api 请求 = {} 返回的数据进行加密", req.getServletPath());
 
+            return apiEncrypt.encryptObj(obj);
+        } else {
+            return body;
+        }
     }
 }
