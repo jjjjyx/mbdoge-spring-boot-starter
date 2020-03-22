@@ -97,6 +97,7 @@ public class WebApiAutoConfigure {
     }
 
     @Bean
+    @ConditionalOnMissingBean(ApiEncrypt.class)
     public ApiEncrypt apiAesEncrypt () {
         final String secret = apiEncryptProperties.getSecret();
         return new ApiEncrypt() {
