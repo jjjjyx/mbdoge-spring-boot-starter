@@ -9,9 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
- *
+ * 貌似没什么作用，有更好的替代工具： Apache Commons BeanUtils
  * @author jyx
  */
+@Deprecated
 public class POJOUtils {
 
     @SneakyThrows

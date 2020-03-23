@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author jyx
@@ -28,8 +29,12 @@ public class User implements UserDetails, Serializable {
     private Integer userStatus;
     private Date nextExpireTime;
 
+    @JsonIgnore
     private List<GrantedAuthority> authorities;
 
+    public List<String> getRoles () {
+        return this.authorities.stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
+    }
 
     /**
      * 用户唯一标识
@@ -60,11 +65,10 @@ public class User implements UserDetails, Serializable {
     private String os;
 
 
-    @Override
-    @JsonIgnore
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-    }
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return authorities;
+//    }
 
     @Override
     @JsonIgnore
