@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Event {
-    private final String name;
+    private final EventType type;
     private final Map<String, Object> data = new HashMap<>();
 //    private final Object[] args;
 
@@ -13,8 +13,8 @@ public class Event {
     private boolean canStop = false;
     private boolean immediatelyStoped = false;
 
-    public Event(String name, Map<String, Object> data) {
-        this.name = name;
+    public Event(EventType type, Map<String, Object> data) {
+        this.type = type;
 
         if (data != null) {
             this.data.putAll(data);

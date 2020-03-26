@@ -26,11 +26,4 @@ public interface EventType {
      */
     String name();
 }
- enum A implements EventType {
-     event {
-          public String[] getNames() {
-                  return new String[] {"arg1", "arg2"};
-          }
-     }
- }
 
