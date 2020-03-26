@@ -244,12 +244,7 @@ class DispatchTest {
     }
 
     enum D implements EventType {
-        event {
-            @Override
-            public String[] getNames() {
-                return new String[0];
-            }
-        },
+        event,
 
         init {
             @Override
