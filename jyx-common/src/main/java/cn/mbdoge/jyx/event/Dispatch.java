@@ -8,9 +8,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Slf4j
-public class Dispatch {
+public class Dispatch<T extends EventType> {
 
-    private Map<EventType, List<Callback>> eventCallbacks = new HashMap<>();
+    private Map<T, List<Callback>> eventCallbacks = new HashMap<>();
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
 //    protected static String[] parseName (String eventName) {
@@ -24,13 +24,13 @@ public class Dispatch {
 //    }
 
 
-    protected void listen(EventType type, Callback callBack) {
+    protected void listen(T type, Callback callBack) {
         List<Callback> callbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
         callbackList.add(callBack);
-        log.trace("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type, callbackList.size() ,callBack.toString());
+        log.trace("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
-    public void on(EventType type, Callback callBack){
+    public void on(T type, Callback callBack){
 //        String[] names = parseName(eventName);
 //        for (String name : names) {
 //
@@ -38,44 +38,47 @@ public class Dispatch {
         this.listen(type, callBack);
 
     }
-    public void off(EventType type, Callback callBack){
+    public void off(T type, Callback callBack){
 //        String[] names = parseName(eventName);
 //        for (String name : names) {
 
 //        }
-        log.trace("取消监听事件 = eventName = {}, callback = {}", type, callBack.toString());
+        log.trace("取消监听事件 = eventName = {}, callback = {}", type.name(), callBack.toString());
         List<Callback> callbackList = this.eventCallbacks.get(type);
         if (callbackList != null)
             callbackList.remove(callBack);
     }
 
-    public void once(EventType type, Callback callback) {
-        Callback callback1 = (event) -> {
-            callback.call(event);
-            this.off(type, callback);
+    public void once(T type, final Callback callback) {
+        Callback callback1 = new Callback() {
+            @Override
+            public void call(Event event) {
+                off(type, this);
+                callback.call(event);
+            }
         };
+
         this.on(type, callback1);
     }
 
 
-    public Future<Boolean> fire(final EventType type, Map<String, Object> data) {
+    public Future<Boolean> fire(final T type, Map<String, Object> data) {
         Objects.requireNonNull(type);
-        log.trace("触发事件 = eventName = {}, args.size = {}", type, data.size());
+        log.trace("触发事件 = eventName = {}, args.size = {}", type.name(), data.size());
         return executorService.submit(() -> {
 
             List<Callback> callbackList = this.eventCallbacks.get(type);
             if (callbackList == null || callbackList.size() == 0) {
-                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type, callbackList);
+                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type.name(), callbackList);
                 return false;
             }
-            log.trace("事件 {} 响应列表 size = {}", type, callbackList.size());
+            log.trace("事件 {} 响应列表 size = {}", type.name(), callbackList.size());
 
             Event event = new Event(type, data);
             event.setTime(System.currentTimeMillis());
 
             for (Callback callback : callbackList) {
                 callback.call(event);
-
                 if(event.shouldStopPropagationImmediately()) {
                     break;
                 }
@@ -88,7 +91,7 @@ public class Dispatch {
 //        return this.fire(eventName, toMap(paramNames, args));
 //    }
 
-    public Future<Boolean> fire(final EventType type, Object... args) {
+    public Future<Boolean> fire(final T type, Object... args) {
         return this.fire(type, toMap(type.getNames(), args));
     }
 
@@ -113,12 +116,22 @@ public class Dispatch {
         return data;
     }
 
-    public void addEventName(EventType property) {
+    public void addEventName(T property) {
         Objects.requireNonNull(property);
-        log.trace("注冊事件 ={}", property);
+
+        log.trace("注冊事件 ={}", property.name());
         if(!eventCallbacks.containsKey(property)) {
             eventCallbacks.put(property,new ArrayList<>());
         }
+    }
+
+    public int eventSize () {
+        return this.eventCallbacks.size();
+    }
+
+    public int eventSize (T property) {
+        List<Callback> callbackList = this.eventCallbacks.get(property);
+        return callbackList == null ? 0 : callbackList.size();
     }
 
 }

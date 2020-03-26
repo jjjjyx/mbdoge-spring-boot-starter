@@ -16,8 +16,8 @@ public class Event {
     @Getter @Setter
     private long time;
     private boolean stoped = false;
-    private boolean canStop = false;
-    private boolean immediatelyStoped = false;
+//    private boolean canStop = false;
+//    private boolean immediatelyStoped = false;
 
     public Event(EventType type, Map<String, Object> data) {
         this.type = type;
@@ -39,12 +39,13 @@ public class Event {
         this.stoped = true;
     }
 
+//    public void stopPropagationImmediately(){
+//        this.stoped = this.immediatelyStoped = true;
+//    }
 
-    public void stopPropagationImmediately(){
-        this.stoped = this.immediatelyStoped = true;
-    }
     public boolean shouldStopPropagationImmediately() {
-        return this.canStop || this.immediatelyStoped;
+//        return this.canStop || this.immediatelyStoped;
+        return this.stoped;
     }
 
 }
