@@ -1,14 +1,20 @@
 package cn.mbdoge.jyx.event;
 
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Event {
+    @Getter
     private final EventType type;
     private final Map<String, Object> data = new HashMap<>();
 //    private final Object[] args;
 
+    @Getter @Setter
+    private long time;
     private boolean stoped = false;
     private boolean canStop = false;
     private boolean immediatelyStoped = false;
@@ -33,9 +39,9 @@ public class Event {
         this.stoped = true;
     }
 
+
     public void stopPropagationImmediately(){
-        this.stoped = true;
-        this.immediatelyStoped = true;
+        this.stoped = this.immediatelyStoped = true;
     }
     public boolean shouldStopPropagationImmediately() {
         return this.canStop || this.immediatelyStoped;

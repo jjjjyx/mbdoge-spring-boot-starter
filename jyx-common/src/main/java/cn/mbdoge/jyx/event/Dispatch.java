@@ -13,21 +13,21 @@ public class Dispatch {
     private Map<EventType, List<Callback>> eventCallbacks = new HashMap<>();
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    protected static String[] parseName (String eventName) {
-        if (isEmpty(eventName)) {
-            return new String[0];
-        }
-        return eventName.split("\\s+");
-    }
-    protected static boolean isEmpty (String str) {
-        return (str == null || "".equals(str));
-    }
+//    protected static String[] parseName (String eventName) {
+//        if (isEmpty(eventName)) {
+//            return new String[0];
+//        }
+//        return eventName.split("\\s+");
+//    }
+//    protected static boolean isEmpty (String str) {
+//        return (str == null || "".equals(str));
+//    }
 
 
     protected void listen(EventType type, Callback callBack) {
         List<Callback> callbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
         callbackList.add(callBack);
-        log.trace("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
+        log.trace("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type, callbackList.size() ,callBack.toString());
     }
 
     public void on(EventType type, Callback callBack){
@@ -60,17 +60,19 @@ public class Dispatch {
 
     public Future<Boolean> fire(final EventType type, Map<String, Object> data) {
         Objects.requireNonNull(type);
-        log.trace("触发事件 = eventName = {}, args.size = {}", type.name(), data.size());
+        log.trace("触发事件 = eventName = {}, args.size = {}", type, data.size());
         return executorService.submit(() -> {
 
             List<Callback> callbackList = this.eventCallbacks.get(type);
             if (callbackList == null || callbackList.size() == 0) {
-                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type.name(), callbackList);
+                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type, callbackList);
                 return false;
             }
-            log.trace("事件 {} 响应列表 size = {}", type.name(), callbackList.size());
+            log.trace("事件 {} 响应列表 size = {}", type, callbackList.size());
 
             Event event = new Event(type, data);
+            event.setTime(System.currentTimeMillis());
+
             for (Callback callback : callbackList) {
                 callback.call(event);
 

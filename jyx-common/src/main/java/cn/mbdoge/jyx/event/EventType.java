@@ -18,7 +18,9 @@ public interface EventType {
      * 返回事件类型参数名称列表
      * @return
      */
-    String[] getNames();
+    default String[] getNames() {
+        return new String[0];
+    }
 
     /**
      * 返回事件名称
@@ -26,4 +28,5 @@ public interface EventType {
      */
     String name();
 }
+
 
