@@ -16,7 +16,7 @@ dependencies {
 def localRepositoryPath = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
 subprojects {
-    group = 'jyx'
+    group = 'cn.mbdoge.jyx'
     version = '0.0.1'
 
     apply plugin: 'maven'
