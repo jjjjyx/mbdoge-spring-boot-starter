@@ -44,7 +44,7 @@ public class ControllerHandlerAdvice {
 
     protected final MessageSourceAccessor messageSourceAccessor;
 
-    public ControllerHandlerAdvice(@Qualifier("apiMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor) {
+    public ControllerHandlerAdvice(MessageSourceAccessor messageSourceAccessor) {
         this.messageSourceAccessor = messageSourceAccessor;
     }
 

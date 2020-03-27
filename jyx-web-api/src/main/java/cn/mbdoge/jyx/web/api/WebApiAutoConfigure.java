@@ -1,9 +1,6 @@
 package cn.mbdoge.jyx.web.api;
 
 
-import cn.mbdoge.jyx.encrypt.AesEncrypt;
-import cn.mbdoge.jyx.web.encrypt.ApiEncrypt;
-import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.language.ApiMessageProperties;
 import cn.mbdoge.jyx.web.language.SmartLocaleResolver;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,25 +32,25 @@ import java.util.*;
  */
 @Slf4j
 @Configuration(proxyBeanMethods =false)
-@EnableConfigurationProperties({ApiMessageProperties.class, ApiEncryptProperties.class})
+@EnableConfigurationProperties({ApiMessageProperties.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
 
 public class WebApiAutoConfigure {
 
     private final ApiMessageProperties apiMessageProperties;
-    private final ApiEncryptProperties apiEncryptProperties;
-    private final ObjectMapper objectMapper;
+//    private final ApiEncryptProperties apiEncryptProperties;
+//    private final ObjectMapper objectMapper;
 
-    public WebApiAutoConfigure(ApiMessageProperties apiMessageProperties, ApiEncryptProperties apiEncryptProperties, ObjectMapper objectMapper) {
+    public WebApiAutoConfigure(ApiMessageProperties apiMessageProperties) {
         this.apiMessageProperties = apiMessageProperties;
 //        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
 //        System.out.println("requestMappingHandlerAdapter = " + requestMappingHandlerAdapter);
 
 //        requestMappingHandlerAdapter.setResponseBodyAdvice(Collections.singletonList(encodeResponseBodyAdvice()));
 //        requestMappingHandlerAdapter.afterPropertiesSet();
-        this.apiEncryptProperties = apiEncryptProperties;
-        this.objectMapper = objectMapper;
+//        this.apiEncryptProperties = apiEncryptProperties;
+//        this.objectMapper = objectMapper;
 //        WebMvcConfigurer
     }
 
@@ -62,7 +59,7 @@ public class WebApiAutoConfigure {
      * 配置api的 多语言
      * @return
      */
-    @Bean(name = "apiMessageSource")
+    @Bean(name = "messageSource")
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 //        messageSource.addBasenames("classpath:org/springframework/security/messages");
@@ -81,7 +78,7 @@ public class WebApiAutoConfigure {
      * @return
      * @see cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice
      */
-    @Bean(name = "apiMessageSourceAccessor")
+    @Bean(name = "messageSourceAccessor")
     public MessageSourceAccessor messageSourceAccessor() {
         return new MessageSourceAccessor(messageSource());
     }
@@ -100,55 +97,6 @@ public class WebApiAutoConfigure {
         return new SmartLocaleResolver();
     }
 
-    @Bean
-    @ConditionalOnMissingBean(ApiEncrypt.class)
-    public ApiEncrypt apiAesEncrypt () {
-        final String secret = apiEncryptProperties.getSecret();
-        return new ApiEncrypt() {
-            @Override
-            public String encrypt(String plainText) {
-                try {
-                    return AesEncrypt.encrypt(plainText, secret);
-                } catch (GeneralSecurityException e) {
-                    log.warn("加密失败 reason: {}", e.getMessage());
-                    return "";
-                }
-            }
-
-            @Override
-            public String encryptObj(Object obj) {
-                Objects.requireNonNull(obj);
-                try {
-                    String json = objectMapper.writeValueAsString(obj);
-                    return this.encrypt(json);
-                } catch (JsonProcessingException e) {
-                    log.warn("加密对象失败 reason: {}", e.getMessage());
-                }
-                return "";
-            }
-
-            @Override
-            public String decrypt(String content) {
-                try {
-                    return AesEncrypt.decrypt(content, secret);
-                } catch (GeneralSecurityException e) {
-                    log.debug("解密失败 reason: {}", e.getMessage());
-                    return "";
-                }
-            }
-
-            @Override
-            public <T> T decrypt(String content, Class<T> cla) {
-                try {
-                    String decrypt = AesEncrypt.decrypt(content, secret);
-                    return objectMapper.readValue(decrypt, cla);
-                } catch (GeneralSecurityException | JsonProcessingException e) {
-                    log.debug("转换密文失败 reason: {}", e.getMessage());
-                }
-                return (T) null;
-            }
-        };
-    }
 
     /**
      * 让验证时快熟失效

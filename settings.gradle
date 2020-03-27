@@ -2,6 +2,6 @@ rootProject.name = 'jyx-spring-boot-starter'
 
 include 'jyx-common'
 include 'jyx-web-api'
-include 'jyx-web-jwt'
+include 'jyx-web-security'
 include 'example'
 
