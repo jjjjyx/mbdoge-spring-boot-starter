@@ -8,6 +8,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties("mbdoge.api.encrypt")
 public class ApiEncryptProperties {
-
+    private boolean enabled = false;
     private String secret = "";
 }

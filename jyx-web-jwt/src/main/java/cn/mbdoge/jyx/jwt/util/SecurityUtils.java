@@ -1,13 +1,13 @@
 package cn.mbdoge.jyx.jwt.util;
 
 
+import cn.mbdoge.jyx.jwt.core.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public final class SecurityUtils {
@@ -28,14 +28,14 @@ public final class SecurityUtils {
 
     public static List<String> getCurrentUserRoleList () {
         return getUsernameAuthorities().stream()
-                .map((Function<GrantedAuthority, String>) GrantedAuthority::getAuthority)
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
     }
 
-    public static UserDetails getUser() {
+    public static User getUser() {
         Object auto = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (auto instanceof UserDetails) {
-            return (UserDetails) auto;
+        if (auto instanceof User) {
+            return (User) auto;
         }
         return null;
     }

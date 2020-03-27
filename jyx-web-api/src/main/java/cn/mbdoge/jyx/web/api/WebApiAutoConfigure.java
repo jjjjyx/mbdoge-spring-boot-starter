@@ -22,6 +22,8 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.core.Ordered;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.PostConstruct;
 import java.security.GeneralSecurityException;
@@ -36,6 +38,7 @@ import java.util.*;
 @EnableConfigurationProperties({ApiMessageProperties.class, ApiEncryptProperties.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
+
 public class WebApiAutoConfigure {
 
     private final ApiMessageProperties apiMessageProperties;
@@ -51,6 +54,7 @@ public class WebApiAutoConfigure {
 //        requestMappingHandlerAdapter.afterPropertiesSet();
         this.apiEncryptProperties = apiEncryptProperties;
         this.objectMapper = objectMapper;
+//        WebMvcConfigurer
     }
 
 
