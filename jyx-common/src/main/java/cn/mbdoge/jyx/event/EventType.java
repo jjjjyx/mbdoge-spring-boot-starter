@@ -14,12 +14,13 @@ package cn.mbdoge.jyx.event;
  */
 public interface EventType {
 
+    String[] emptyNames = {};
     /**
      * 返回事件类型参数名称列表
      * @return
      */
     default String[] getNames() {
-        return new String[0];
+        return emptyNames;
     }
 
     /**
