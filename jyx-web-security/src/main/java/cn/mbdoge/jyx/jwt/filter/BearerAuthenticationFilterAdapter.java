@@ -4,9 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.Constant;
 
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -19,9 +22,11 @@ import java.io.IOException;
 public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFilter {
 
     protected final JwtTokenProvider jwtTokenProvider;
+    protected final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public BearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider) {
+    public BearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.authenticationEntryPoint = authenticationEntryPoint;
     }
 
     public String getToken(HttpServletRequest request) {
@@ -35,12 +40,11 @@ public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFi
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getToken(request);
-
         if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
+//        BasicAuthenticationFilter
         try {
             UserDetails userDetails = jwtTokenProvider.getUserDetails(token);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
@@ -48,9 +52,12 @@ public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFi
             this.logger.trace("Authentication success: " + auth);
             // 这里没有验证服务端限制的过期， 因为user的设计 没有过期项，也没有禁用相关
             SecurityContextHolder.getContext().setAuthentication(auth);
-        } catch (Exception e) {
+        } catch (AuthenticationException e) {
             SecurityContextHolder.clearContext();
             this.logger.debug("Authentication request for failed: " + e.getMessage());
+            authenticationEntryPoint.commence(request, response, e);
+            return;
+            // 提交了token 却验证错误
         }
 
         filterChain.doFilter(request, response);

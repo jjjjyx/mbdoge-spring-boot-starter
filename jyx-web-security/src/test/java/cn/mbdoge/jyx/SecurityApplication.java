@@ -1,58 +1,85 @@
 package cn.mbdoge.jyx;
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
+import cn.mbdoge.jyx.jwt.User;
 import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
+import cn.mbdoge.jyx.security.ConfigureHttpSecurity;
 import cn.mbdoge.jyx.security.EnableSecurityConfigure;
-import cn.mbdoge.jyx.web.api.WebApiAutoConfigure;
 import cn.mbdoge.jyx.web.tomcat.WebServerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
+import java.util.List;
 
 @SpringBootApplication()
-@Controller
-@Configuration
-@EnableAutoConfiguration
 public class SecurityApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println(Arrays.toString(args));
+//        WebMvcAutoConfiguration
+//        System.out.println(Arrays.toString(args));
     }
 
+
+
     @Configuration
-    public static class SecurityConfigure extends EnableSecurityConfigure {
+    public static class SecurityConfigure2 extends EnableSecurityConfigure {
+        @Autowired
+        private PasswordEncoder passwordEncoder;
 
         @Bean("userDetailsServiceImpl")
         @Override
         public UserDetailsService userDetailsService() {
             return username -> {
                 System.out.println("username = " + username);
-                return null;
+                User vo = new User();
+
+                vo.setUsername(username);
+//                vo.setPassword(passwordEncoder.encode(username + "1"));
+                vo.setPassword(passwordEncoder.encode(username));
+                vo.setUserStatus(0);
+                // 30 s 后过期
+                Date date = new Date(System.currentTimeMillis() + 1000 * 30);
+                vo.setNextExpireTime(date);
+                List<GrantedAuthority> test = Arrays.asList(
+                        new SimpleGrantedAuthority("TEST"),
+                        new SimpleGrantedAuthority("XX")
+                );
+                vo.setAuthorities(test);
+
+//                user.getRoles().stream()
+//                        .map(item -> new SimpleGrantedAuthority(item.getName().toUpperCase())).collect(Collectors.toList())
+//                vo.setAuthorities();
+                return vo;
+            };
+        }
+
+        @Override
+        public ConfigureHttpSecurity configureHttpSecurity() {
+            return (httpSecurity) -> {
+                httpSecurity.authorizeRequests()
+                        .antMatchers(HttpMethod.GET, "/a/**").permitAll()
+                        .anyRequest().authenticated();
             };
         }
 
         @Bean
-        public BearerAuthenticationFilterAdapter customBearerAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
-            return new BearerAuthenticationFilterAdapter(jwtTokenProvider) {
-
+        @Override
+        public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
+            return new BearerAuthenticationFilterAdapter(jwtTokenProvider, authenticationEntryPoint) {
             };
         }
     }
@@ -63,7 +90,6 @@ public class SecurityApplication implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
-        System.out.println("1111 = " + 1111);
 
         try {
             SpringApplication.run(SecurityApplication.class, args);
@@ -72,15 +98,5 @@ public class SecurityApplication implements CommandLineRunner {
         }
     }
 
-    @GetMapping("/input2")
-    @ResponseBody
-    @PreAuthorize("isAuthenticated()")
-    public Map input2(@RequestParam(name = "test") String test){
-        String s = "aaa";
-        Map m = new HashMap();
-        m.put("a", "a");
-        m.put("s", s);
-        m.put("d", test);
-        return m;
-    }
+
 }

@@ -44,9 +44,8 @@ public class ControllerHandlerAdvice {
 
     protected final MessageSourceAccessor messageSourceAccessor;
 
-    public ControllerHandlerAdvice(MessageSourceAccessor messageSourceAccessor) {
+    public ControllerHandlerAdvice(@Qualifier("webMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor) {
         this.messageSourceAccessor = messageSourceAccessor;
-        System.out.println("messageSourceAccessor = " + messageSourceAccessor);
     }
 
     /**
@@ -210,14 +209,14 @@ public class ControllerHandlerAdvice {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler({NoHandlerFoundException.class})
     public RespResult<?> noHandlerFoundException(NoHandlerFoundException e) {
-        log.trace("Not Found", e);
+        log.trace("Not Found = {}", e.getRequestURL());
         return RespResult.info(this.messageSourceAccessor.getMessage("controller.404"));
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler({Exception.class})
     public RespResult<?> handleException(Exception e) {
-        log.error("通用异常", e);
+        log.error("通用异常 = e.class = {} message = {}", e.getClass(), e.getMessage(), e);
         return RespResult.error(this.messageSourceAccessor.getMessage("controller.500"));
     }
 

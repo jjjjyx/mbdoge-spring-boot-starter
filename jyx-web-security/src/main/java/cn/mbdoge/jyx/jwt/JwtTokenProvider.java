@@ -1,10 +1,13 @@
 package cn.mbdoge.jyx.jwt;
 
-import cn.mbdoge.jyx.jwt.exception.InvalidJwtAuthenticationException;
-import cn.mbdoge.jyx.security.SecurityProperties;
+import cn.mbdoge.jyx.security.WebSecurityProperties;
 import io.jsonwebtoken.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,17 +21,21 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class JwtTokenProvider {
 
 
-    private final SecurityProperties.Jwt jwt;
+    private final WebSecurityProperties.Jwt jwt;
 
     private final byte[] secret;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final MessageSourceAccessor message;
 
-    public JwtTokenProvider(RedisTemplate<String, Object> redisTemplate, SecurityProperties securityProperties) {
-        this.jwt = securityProperties.getJwt();
+
+    public JwtTokenProvider(WebSecurityProperties webSecurityProperties, RedisTemplate<String, Object> redisTemplate, @Qualifier("webMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor) {
+        this.jwt = webSecurityProperties.getJwt();
         this.redisTemplate = redisTemplate;
+        this.message = messageSourceAccessor;
         this.secret = Base64.getEncoder().encode(jwt.getSecret().getBytes());
     }
 
@@ -54,13 +61,16 @@ public class JwtTokenProvider {
         String key = getUserKey(username, id);
         operation.set(key, userDetails, jwt.getExpiration(), TimeUnit.SECONDS);
 
-        return Jwts.builder()
+
+        String compact = Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .setId(id)
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
+        log.trace("user = {} gen token success! token size = {} id = {}", username, compact.length(), id);
+        return compact;
     }
 
     public UserDetails getUserDetails(String token) {
@@ -75,12 +85,12 @@ public class JwtTokenProvider {
         String key = getUserKey(username, id);
 
         if (!redisTemplate.hasKey(key)) {
-            throw new CredentialsExpiredException("token 失效");
+            throw new BadCredentialsException(message.getMessage("BindAuthenticator.badCredentials", "token 无效"));
         }
 
         User userDetails = (User) redisTemplate.opsForValue().get(key);
         if (userDetails == null) {
-            throw new CredentialsExpiredException("token 失效");
+            throw new BadCredentialsException(message.getMessage("BindAuthenticator.badCredentials", "token 过期"));
         }
 
         return userDetails;
@@ -93,9 +103,13 @@ public class JwtTokenProvider {
                 .setSigningKey(secret)
                 .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new InvalidJwtAuthenticationException("AccountStatusUserDetailsChecker.token.expired" , e);
+
+//            System.out.println(e.getMessage());
+//            System.out.println("e.getClaims() = " + e.getClaims());
+            throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "token 过期") , e);
         } catch (Exception e) {
-            throw new InvalidJwtAuthenticationException("AbstractAccessDecisionManager.accessDenied", e);
+            // 其他情况的解析失败
+            throw new BadCredentialsException(message.getMessage("BindAuthenticator.badCredentials", "token 无效"), e);
         }
     }
 

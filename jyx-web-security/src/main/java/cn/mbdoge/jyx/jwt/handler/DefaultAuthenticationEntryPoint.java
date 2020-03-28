@@ -6,6 +6,7 @@ import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.model.RespResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -22,6 +23,9 @@ import java.io.PrintWriter;
 @Component
 @Slf4j
 public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint {
+    public DefaultAuthenticationEntryPoint() {
+    }
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -29,19 +33,16 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
     private ApiEncrypt apiEncrypt;
 
     @Autowired
-    private MessageSourceAccessor messageSourceAccessor;
-
-    @Autowired
     private ApiEncryptProperties apiEncryptProperties;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
         response.setContentType("application/json; charset=utf-8");
-        log.debug("JwtAuthenticationEntryPoint err.class = {}", e.getClass());
+
         String ret = e.getMessage();
-        if (e instanceof InsufficientAuthenticationException) {
-            ret = messageSourceAccessor.getMessage("ExceptionTranslationFilter.insufficientAuthentication");
-        }
+//        if (e instanceof InsufficientAuthenticationException) {
+//            ret = messageSourceAccessor.getMessage("ExceptionTranslationFilter.insufficientAuthentication");
+//        }
 
         log.debug("JwtAuthenticationEntryPoint : message = {}, Exception = {}", e.getMessage(), e.getClass());
         PrintWriter out = response.getWriter();

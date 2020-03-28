@@ -4,7 +4,8 @@ package cn.mbdoge.jyx.security;
 
 
 import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
-import cn.mbdoge.jyx.jwt.filter.DefaultBearerAuthenticationFilter;
+import cn.mbdoge.jyx.jwt.handler.AccessExceptionAdvice;
+import cn.mbdoge.jyx.jwt.handler.DefaultAccessDeniedHandler;
 import cn.mbdoge.jyx.jwt.handler.DefaultAuthenticationEntryPoint;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.encrypt.EncodeResponseBodyAdvice;
@@ -22,17 +23,21 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.Ordered;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -43,14 +48,16 @@ import java.util.Collections;
  * redis
  */
 @Slf4j
-@Configuration(proxyBeanMethods =false)
-@EnableConfigurationProperties({SecurityProperties.class, ApiEncryptProperties.class})
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableConfigurationProperties({WebSecurityProperties.class, ApiEncryptProperties.class})
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 12)
-@Import({EnableSecurityConfigure.class, EncodeResponseBodyAdvice.class})
-public class SecurityConfigure extends WebSecurityConfigurerAdapter {
+@Import({EnableSecurityConfigure.class, EncodeResponseBodyAdvice.class, AccessExceptionAdvice.class})
+public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private SecurityProperties securityProperties;
+    private WebSecurityProperties webSecurityProperties;
 
     @Autowired
     private ConfigureHttpSecurity configureHttpSecurity;
@@ -59,23 +66,27 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
     private BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter;
 
     @Autowired
-    private DefaultAuthenticationEntryPoint defaultAuthenticationEntryPoint;
+    private AuthenticationEntryPoint authenticationEntryPoint;
+
+//    @Autowired
+//    private DefaultAccessDeniedHandler defaultAccessDeniedHandler;
+
+    @Autowired
+    private CustomDaoAuthenticationProvider customDaoAuthenticationProvider;
+
 
 //    @Autowired
 //    private CorsConfigurationSource corsConfigurationSource;
 
-    @Bean
-    public DaoAuthenticationProvider authenticationProvider(MessageSource messageSource, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setHideUserNotFoundExceptions(false);
-        provider.setPasswordEncoder(passwordEncoder);
-        provider.setUserDetailsService(userDetailsService);
-        provider.setMessageSource(messageSource);
-        return provider;
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        super.configure(auth);
+        auth.authenticationProvider(customDaoAuthenticationProvider);
+
     }
 
-
-//    @Bean
+    //    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("*"));
@@ -86,7 +97,7 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
         configuration.setExposedHeaders(Arrays.asList("Accept-Language", "Authorization", "Content-Disposition", "Content-Length"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration(securityProperties.getCorsUrl(), configuration);
+        source.registerCorsConfiguration(webSecurityProperties.getCorsUrl(), configuration);
         return source;
     }
 
@@ -118,13 +129,12 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
         if (configureHttpSecurity!=null) {
             configureHttpSecurity.configure(httpSecurity);
         }
-
-        httpSecurity.exceptionHandling().authenticationEntryPoint(defaultAuthenticationEntryPoint);
+        httpSecurity.exceptionHandling()
+//                .accessDeniedHandler(defaultAccessDeniedHandler)
+                .authenticationEntryPoint(authenticationEntryPoint);
         httpSecurity.cors().configurationSource(corsConfigurationSource());
 
         httpSecurity.csrf().disable();
-        System.out.println("defaultBearerAuthenticationFilter = " + bearerAuthenticationFilterAdapter);
-        System.out.println("defaultAuthenticationEntryPoint = " + defaultAuthenticationEntryPoint);
         if (bearerAuthenticationFilterAdapter !=null) {
             httpSecurity.addFilterBefore(bearerAuthenticationFilterAdapter, UsernamePasswordAuthenticationFilter.class);
         }
@@ -134,7 +144,9 @@ public class SecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {
-        return super.authenticationManager();
+        AuthenticationManager authenticationManager = super.authenticationManager();
+
+        return authenticationManager;
     }
 
 

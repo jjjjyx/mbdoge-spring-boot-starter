@@ -1,13 +1,11 @@
 package cn.mbdoge.jyx.event;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-@Slf4j
+
 public class Dispatch<T extends EventType> {
 
     private Map<T, List<Callback>> eventCallbacks = new HashMap<>();
@@ -27,7 +25,7 @@ public class Dispatch<T extends EventType> {
     protected void listen(T type, Callback callBack) {
         List<Callback> callbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
         callbackList.add(callBack);
-        log.trace("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
+//        log.info("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
     public void on(T type, Callback callBack){
@@ -43,7 +41,7 @@ public class Dispatch<T extends EventType> {
 //        for (String name : names) {
 
 //        }
-        log.trace("取消监听事件 = eventName = {}, callback = {}", type.name(), callBack.toString());
+//        log.trace("取消监听事件 = eventName = {}, callback = {}", type.name(), callBack.toString());
         List<Callback> callbackList = this.eventCallbacks.get(type);
         if (callbackList != null)
             callbackList.remove(callBack);
@@ -64,15 +62,15 @@ public class Dispatch<T extends EventType> {
 
     public Future<Boolean> fire(final T type, Map<String, Object> data) {
         Objects.requireNonNull(type);
-        log.trace("触发事件 = eventName = {}, args.size = {}", type.name(), data.size());
+//        log.trace("触发事件 = eventName = {}, args.size = {}", type.name(), data.size());
         return executorService.submit(() -> {
 
             List<Callback> callbackList = this.eventCallbacks.get(type);
             if (callbackList == null || callbackList.size() == 0) {
-                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type.name(), callbackList);
+//                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type.name(), callbackList);
                 return false;
             }
-            log.trace("事件 {} 响应列表 size = {}", type.name(), callbackList.size());
+//            log.trace("事件 {} 响应列表 size = {}", type.name(), callbackList.size());
 
             Event event = new Event(type, data);
             event.setTime(System.currentTimeMillis());
@@ -111,7 +109,7 @@ public class Dispatch<T extends EventType> {
         for (int i = nameLength; i < argsLength; i++) {
             data.put(String.valueOf(i), args[i]);
         }
-        log.trace("paramNames length = {} args length = {}, paramNames = {}", nameLength, argsLength, data.keySet());
+//        log.trace("paramNames length = {} args length = {}, paramNames = {}", nameLength, argsLength, data.keySet());
 
         return data;
     }
@@ -119,7 +117,7 @@ public class Dispatch<T extends EventType> {
     public void addEventName(T property) {
         Objects.requireNonNull(property);
 
-        log.trace("注冊事件 ={}", property.name());
+//        log.trace("注冊事件 ={}", property.name());
         if(!eventCallbacks.containsKey(property)) {
             eventCallbacks.put(property,new ArrayList<>());
         }

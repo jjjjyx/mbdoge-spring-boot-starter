@@ -13,6 +13,19 @@ dependencies {
 
 }
 
+
+
+configurations {
+    // 支持通过group、module排除，可以同时使用
+    all*.exclude group: 'commons-logging', module: 'commons-logging' // common-logging
+    all*.exclude group: 'log4j', module: 'log4j' // log4j
+    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-core' // slf4j -> log4j2
+    all*.exclude group: 'org.apache.logging.log4j', module: 'log4j-slf4j-impl' // log4j2
+    all*.exclude group: 'org.slf4j', module: 'slf4j-jdk14' // slf4j -> jdk-logging
+    all*.exclude group: 'org.slf4j', module: 'slf4j-jcl' // slf4j -> common-logging
+    all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12' // slf4j -> log4j
+}
+
 def localRepositoryPath = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
 
 subprojects {
@@ -27,12 +40,6 @@ subprojects {
         mavenCentral()
     }
 
-//    dependencyManagement {
-//        imports {
-////            mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-//            mavenBom("org.springframework.boot:spring-boot-dependencies:2.1.7.RELEASE")
-//        }
-//    }
 
     test {
         useJUnitPlatform()

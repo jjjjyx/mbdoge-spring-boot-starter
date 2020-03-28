@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-cn.mbdoge.jyx.web.api.WebApiAutoConfigure
+cn.mbdoge.jyx.web.WebApiAutoConfigure

@@ -1,4 +1,4 @@
-package cn.mbdoge.jyx.web.api;
+package cn.mbdoge.jyx.web;
 
 
 import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
@@ -6,11 +6,13 @@ import cn.mbdoge.jyx.web.language.ApiMessageProperties;
 import cn.mbdoge.jyx.web.language.SmartLocaleResolver;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -58,11 +60,10 @@ public class WebApiAutoConfigure {
      * 配置api的 多语言
      * @return
      */
-    @Bean(name = "messageSource")
+    @Bean(name = "webMessageSource")
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 //        messageSource.addBasenames("classpath:org/springframework/security/messages");
-//        messageSource.addBasenames("classpath:com/ls/starter/messages");
         List<String> source = apiMessageProperties.getSource();
         for (String s : source) {
             messageSource.addBasenames(s);
@@ -77,9 +78,9 @@ public class WebApiAutoConfigure {
      * @return
      * @see cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice
      */
-    @Bean(name = "messageSourceAccessor")
-    public MessageSourceAccessor messageSourceAccessor() {
-        return new MessageSourceAccessor(messageSource());
+    @Bean(name = "webMessageSourceAccessor")
+    public MessageSourceAccessor messageSourceAccessor(@Qualifier("webMessageSource") MessageSource messageSource) {
+        return new MessageSourceAccessor(messageSource);
     }
 
     /**
@@ -103,9 +104,9 @@ public class WebApiAutoConfigure {
      * @return
      */
     @Bean
-    public LocalValidatorFactoryBean localValidator() {
+    public LocalValidatorFactoryBean localValidator(@Qualifier("webMessageSource") MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
-        bean.setValidationMessageSource(messageSource());
+        bean.setValidationMessageSource(messageSource);
         Map<String, String> map = new HashMap<>(1);
         map.put("hibernate.validator.fail_fast", "true");
         bean.setValidationPropertyMap(map);
@@ -115,12 +116,12 @@ public class WebApiAutoConfigure {
 
 
 //    @ConditionalOnProperty(prefix = "mbdoge.api.encrypt",value = "enabled",havingValue = "true")
-    @PostConstruct
-    public void init () {
-
-//        requestMappingHandlerAdapter.afterPropertiesSet();
-//        requestMappingHandlerAdapter.setResponseBodyAdvice( Collections.singletonList(encodeResponseBodyAdvice()));
-    }
+//    @PostConstruct
+//    public void init () {
+//
+////        requestMappingHandlerAdapter.afterPropertiesSet();
+////        requestMappingHandlerAdapter.setResponseBodyAdvice( Collections.singletonList(encodeResponseBodyAdvice()));
+//    }
 
 
 

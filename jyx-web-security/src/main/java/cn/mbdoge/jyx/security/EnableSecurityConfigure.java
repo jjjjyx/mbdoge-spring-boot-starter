@@ -18,26 +18,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.config.core.GrantedAuthorityDefaults;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 
 @Slf4j
 @Configuration(proxyBeanMethods =false)
 public class EnableSecurityConfigure {
     @Autowired
-    private SecurityProperties securityProperties;
+    private WebSecurityProperties webSecurityProperties;
 
     @Autowired
     private ApiEncryptProperties apiEncryptProperties;
@@ -47,7 +41,7 @@ public class EnableSecurityConfigure {
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
-        return new Pbkdf2PasswordEncoder(securityProperties.getSecret());
+        return new Pbkdf2PasswordEncoder(webSecurityProperties.getSecret());
     }
 
 
@@ -66,11 +60,15 @@ public class EnableSecurityConfigure {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         };
     }
-
+    //    @Autowired
+//    @Qualifier("webMessageSourceAccessor")
+//    private MessageSourceAccessor messageSourceAccessor;
     @Bean
     @ConditionalOnMissingBean(BearerAuthenticationFilterAdapter.class)
-    public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter (JwtTokenProvider jwtTokenProvider) {
-        return new DefaultBearerAuthenticationFilter(jwtTokenProvider);
+    public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter (
+            JwtTokenProvider jwtTokenProvider,
+            AuthenticationEntryPoint authenticationEntryPoint) {
+        return new DefaultBearerAuthenticationFilter(jwtTokenProvider, authenticationEntryPoint);
     }
 
     @Bean

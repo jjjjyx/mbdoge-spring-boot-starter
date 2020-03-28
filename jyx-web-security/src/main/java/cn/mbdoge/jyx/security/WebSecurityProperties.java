@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ConfigurationProperties("mbdoge.web.security")
-public class SecurityProperties {
+public class WebSecurityProperties {
 
     /**
      * 默认加密秘钥 请务必覆盖！
