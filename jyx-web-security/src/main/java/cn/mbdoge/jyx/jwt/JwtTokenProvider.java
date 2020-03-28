@@ -15,17 +15,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 
-import java.util.Base64;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Component
+
 @Slf4j
 public class JwtTokenProvider {
-
-
     private final WebSecurityProperties.Jwt jwt;
 
     private final byte[] secret;
@@ -39,8 +35,33 @@ public class JwtTokenProvider {
         this.message = messageSourceAccessor;
         this.secret = Base64.getEncoder().encode(jwt.getSecret().getBytes());
     }
+    public Set<String> getUserOnlineList(UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        String key = getUserKey(username, "*");
+        return redisTemplate.keys(key);
+    }
+
+    private void checkUserJitNumber (UserDetails userDetails) {
+        log.debug("checkUserJitNumber jwt.getJitMax() = {} ", jwt.getJitMax());
+        Set<String> userOnlineList = this.getUserOnlineList(userDetails);
+        if (jwt.getJitMax() == 0) {
+            return;
+        }
+        log.debug("checkUserJitNumber userOnline size = {} ", userOnlineList.size());
+        int l = userOnlineList.size() - jwt.getJitMax();
+        if (l >= 0) {
+            Iterator<String> iterator = userOnlineList.iterator();
+            for (int i = 0; i <= l; i++) {
+                String key = iterator.next();
+                log.debug("用户数量超出最大值，删除 {}", key);
+                redisTemplate.delete(key);
+            }
+        }
+    }
 
     public String createToken(UserDetails userDetails, String id) {
+        this.checkUserJitNumber(userDetails);
+
         Date now = new Date();
         String username = userDetails.getUsername();
 
@@ -103,12 +124,14 @@ public class JwtTokenProvider {
         String key = getUserKey(username, id);
 
         if (!redisTemplate.hasKey(key)) {
-            throw new BadCredentialsException(message.getMessage("BindAuthenticator.badCredentials", "token 无效"));
+            log.debug("用户提交token 解析成功，但是在redis 中不存在，判定失效");
+            throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "凭证已过期"));
         }
 
         User userDetails = (User) redisTemplate.opsForValue().get(key);
         if (userDetails == null) {
-            throw new BadCredentialsException(message.getMessage("BindAuthenticator.badCredentials", "token 过期"));
+            log.debug("用户提交token 解析成功，但是在redis 中不存在，判定失效");
+            throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "凭证已过期"));
         }
 
         return userDetails;
@@ -124,10 +147,11 @@ public class JwtTokenProvider {
 
 //            System.out.println(e.getMessage());
 //            System.out.println("e.getClaims() = " + e.getClaims());
-            throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "token 过期") , e);
+            throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "凭证已过期") , e);
         } catch (Exception e) {
             // 其他情况的解析失败
-            throw new BadCredentialsException(message.getMessage("BindAuthenticator.badCredentials", "token 无效"), e);
+            log.debug("解析token失败，原因 = {} token = {}",e.getMessage(), token);
+            throw new BadCredentialsException(message.getMessage("AbstractAccessDecisionManager.accessDenied", "凭证无效"), e);
         }
     }
 

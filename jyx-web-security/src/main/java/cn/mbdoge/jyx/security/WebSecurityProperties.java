@@ -36,6 +36,10 @@ public class WebSecurityProperties {
 
         //    private String headerKey = "Authorization";
         private String redisKeyPrefix = "mbdoge:jti:";
+        /**
+         * 用户签名最大个数
+         */
+        private int jitMax = 3;
 
     }
 

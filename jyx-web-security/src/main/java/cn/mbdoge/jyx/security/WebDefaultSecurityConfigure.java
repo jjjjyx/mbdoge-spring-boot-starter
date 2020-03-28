@@ -5,8 +5,6 @@ package cn.mbdoge.jyx.security;
 
 import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.jwt.handler.AccessExceptionAdvice;
-import cn.mbdoge.jyx.jwt.handler.DefaultAccessDeniedHandler;
-import cn.mbdoge.jyx.jwt.handler.DefaultAuthenticationEntryPoint;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.encrypt.EncodeResponseBodyAdvice;
 
@@ -62,14 +60,12 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Autowired
     private ConfigureHttpSecurity configureHttpSecurity;
 
-    @Autowired
-    private BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter;
 
     @Autowired
     private AuthenticationEntryPoint authenticationEntryPoint;
 
-//    @Autowired
-//    private DefaultAccessDeniedHandler defaultAccessDeniedHandler;
+    @Autowired
+    private BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter;
 
     @Autowired
     private CustomDaoAuthenticationProvider customDaoAuthenticationProvider;

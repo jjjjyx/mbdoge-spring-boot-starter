@@ -13,6 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,28 +21,40 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootApplication()
 public class SecurityApplication implements CommandLineRunner {
-
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
     @Override
     public void run(String... args) throws Exception {
 //        WebMvcAutoConfiguration
 //        System.out.println(Arrays.toString(args));
+        String key = "mbdoge:jti:*";
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+        objectOutputStream.writeObject(key);
+        objectOutputStream.flush();
+        byte[] bytes = byteArrayOutputStream.toByteArray();
+
+        Set<String> keys = redisTemplate.keys("\\xac\\xed\\x00\\x05t\\x006mbdoge:jti:jjjjyx:*");
+        System.out.println("keys = " + keys);
     }
 
 
 
     @Configuration
-    public static class SecurityConfigure2 extends EnableSecurityConfigure {
+    public static class SecurityConfigure2 {
         @Autowired
         private PasswordEncoder passwordEncoder;
 
         @Bean("userDetailsServiceImpl")
-        @Override
         public UserDetailsService userDetailsService() {
             return username -> {
                 System.out.println("username = " + username);
@@ -67,7 +80,7 @@ public class SecurityApplication implements CommandLineRunner {
             };
         }
 
-        @Override
+        @Bean
         public ConfigureHttpSecurity configureHttpSecurity() {
             return (httpSecurity) -> {
                 httpSecurity.authorizeRequests()
@@ -77,7 +90,6 @@ public class SecurityApplication implements CommandLineRunner {
         }
 
         @Bean
-        @Override
         public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
             return new BearerAuthenticationFilterAdapter(jwtTokenProvider, authenticationEntryPoint) {
             };

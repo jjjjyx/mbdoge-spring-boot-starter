@@ -9,6 +9,7 @@ import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -42,8 +43,6 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest srequest, ServerHttpResponse response) {
         ServletServerHttpRequest temp = (ServletServerHttpRequest) srequest;
         HttpServletRequest req = temp.getServletRequest();
-        System.out.println(" = " + selectedContentType);
-        System.out.println(" = " + body);
         if (selectedContentType.equals(MediaType.APPLICATION_JSON) || selectedContentType.equals(MediaType.TEXT_PLAIN_VALUE)) {
             Object obj = body;
             if (obj instanceof MappingJacksonValue) {
@@ -51,7 +50,12 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
             }
             log.trace("对方法 api 请求 = {} 返回的数据进行加密", req.getServletPath());
 
-            return apiEncrypt.encryptObj(obj);
+            String resp = apiEncrypt.encryptObj(obj);
+            // String 类型会使用StringHttpMessageConverter 这将会丢失 ""
+            if (obj instanceof String) {
+                resp = "\"" + resp + "\"";
+            }
+            return resp;
         } else {
             return body;
         }

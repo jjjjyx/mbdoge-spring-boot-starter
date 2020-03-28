@@ -13,11 +13,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
-@Component
+
 public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
-    public CustomDaoAuthenticationProvider(
-            @Qualifier("webMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor,
+    public CustomDaoAuthenticationProvider(MessageSourceAccessor messageSourceAccessor,
             PasswordEncoder passwordEncoder,
             UserDetailsService userDetailsService
     ) {

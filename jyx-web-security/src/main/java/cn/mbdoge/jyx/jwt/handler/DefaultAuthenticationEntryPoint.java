@@ -20,20 +20,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-@Component
 @Slf4j
 public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint {
-    public DefaultAuthenticationEntryPoint() {
+
+    private final ObjectMapper objectMapper;
+    private final ApiEncrypt apiEncrypt;
+    private final ApiEncryptProperties apiEncryptProperties;
+
+    public DefaultAuthenticationEntryPoint(ApiEncryptProperties apiEncryptProperties, ObjectMapper objectMapper, ApiEncrypt apiEncrypt) {
+        this.objectMapper = objectMapper;
+        this.apiEncrypt = apiEncrypt;
+        this.apiEncryptProperties = apiEncryptProperties;
     }
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private ApiEncrypt apiEncrypt;
-
-    @Autowired
-    private ApiEncryptProperties apiEncryptProperties;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
