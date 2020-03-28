@@ -2,6 +2,7 @@ package cn.mbdoge.jyx;
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.User;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -39,7 +41,7 @@ public class Contorller {
         return m;
     }
 
-    @GetMapping("/a/login")
+    @GetMapping(value = "/a/login")
     @ResponseBody
 //    @PreAuthorize("isAuthenticated()")
 //    @PreAuthorize("isAuthenticated()")

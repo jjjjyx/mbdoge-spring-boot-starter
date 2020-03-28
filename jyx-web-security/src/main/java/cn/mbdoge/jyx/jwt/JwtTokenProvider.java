@@ -10,6 +10,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +73,23 @@ public class JwtTokenProvider {
         log.trace("user = {} gen token success! token size = {} id = {}", username, compact.length(), id);
         return compact;
     }
+
+    public void clearUser (UserDetails userDetails, String id) {
+        String username = userDetails.getUsername();
+        String key = getUserKey(username, id);
+        redisTemplate.delete(key);
+//        SecurityContextHolder.clearContext();
+    }
+
+    public void refreshUser (UserDetails userDetails, String id) {
+        String username = userDetails.getUsername();
+        String key = getUserKey(username, id);
+
+        ValueOperations<String, Object> operation = redisTemplate.opsForValue();
+        operation.set(key, userDetails);
+//        SecurityContextHolder.clearContext();
+    }
+
 
     public UserDetails getUserDetails(String token) {
 

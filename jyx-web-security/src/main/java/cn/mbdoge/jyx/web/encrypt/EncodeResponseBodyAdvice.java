@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @ConditionalOnWebApplication
-@ConditionalOnProperty(prefix = "mbdoge.web.api.encrypt",value = "enabled",havingValue = "true")
+@ConditionalOnProperty(prefix = "mbdoge.web.security.api.encrypt",value = "enabled",havingValue = "true")
 @ControllerAdvice
 @Order(1)
 public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
@@ -39,12 +39,12 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     }
 
 
-
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest srequest, ServerHttpResponse response) {
         ServletServerHttpRequest temp = (ServletServerHttpRequest) srequest;
         HttpServletRequest req = temp.getServletRequest();
-
-        if (selectedContentType.equals(MediaType.APPLICATION_JSON)) {
+        System.out.println(" = " + selectedContentType);
+        System.out.println(" = " + body);
+        if (selectedContentType.equals(MediaType.APPLICATION_JSON) || selectedContentType.equals(MediaType.TEXT_PLAIN_VALUE)) {
             Object obj = body;
             if (obj instanceof MappingJacksonValue) {
                 obj = ((MappingJacksonValue) obj).getValue();

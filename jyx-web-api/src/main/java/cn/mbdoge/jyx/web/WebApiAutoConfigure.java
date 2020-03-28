@@ -2,7 +2,6 @@ package cn.mbdoge.jyx.web;
 
 
 import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
-import cn.mbdoge.jyx.web.language.ApiMessageProperties;
 import cn.mbdoge.jyx.web.language.SmartLocaleResolver;
 
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +11,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.MessageSource;
-import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -23,7 +21,6 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
 
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -32,19 +29,19 @@ import java.util.*;
  */
 @Slf4j
 @Configuration(proxyBeanMethods =false)
-@EnableConfigurationProperties({ApiMessageProperties.class})
+@EnableConfigurationProperties({WebApiProperties.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
 @Import(ControllerHandlerAdvice.class)
 public class WebApiAutoConfigure {
 
-    private final ApiMessageProperties apiMessageProperties;
+    private final WebApiProperties webApiProperties;
 //    private final ApiEncryptProperties apiEncryptProperties;
 //    private final ObjectMapper objectMapper;
 
-    public WebApiAutoConfigure(ApiMessageProperties apiMessageProperties) {
+    public WebApiAutoConfigure(WebApiProperties webApiProperties) {
 
-        this.apiMessageProperties = apiMessageProperties;
+        this.webApiProperties = webApiProperties;
 //        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
 //        System.out.println("requestMappingHandlerAdapter = " + requestMappingHandlerAdapter);
 
@@ -64,7 +61,7 @@ public class WebApiAutoConfigure {
     public MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
 //        messageSource.addBasenames("classpath:org/springframework/security/messages");
-        List<String> source = apiMessageProperties.getSource();
+        List<String> source = webApiProperties.getMessage().getSource();
         for (String s : source) {
             messageSource.addBasenames(s);
         }
@@ -90,7 +87,7 @@ public class WebApiAutoConfigure {
     @Bean
     @ConditionalOnMissingBean(LocaleResolver.class)
     public LocaleResolver localeResolver() {
-        List<String> languages = apiMessageProperties.getLanguages();
+        List<String> languages = webApiProperties.getMessage().getLanguages();
         if (languages.isEmpty()) {
             return new SmartLocaleResolver();
         }

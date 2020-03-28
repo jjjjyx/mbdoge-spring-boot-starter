@@ -12,6 +12,7 @@ import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
 import org.springframework.context.annotation.Bean;
@@ -54,8 +55,8 @@ public class EnableSecurityConfigure {
         return template;
     }
     @Bean("userDetailsServiceImpl")
-    @ConditionalOnMissingBean(UserDetailsService.class)
-    public UserDetailsService userDetailsService (){
+    @ConditionalOnMissingBean(value = UserDetailsService.class, name = "userDetailsServiceImpl")
+    public UserDetailsService userDetailsService () {
         return (username) -> {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         };
@@ -73,7 +74,7 @@ public class EnableSecurityConfigure {
 
     @Bean
     @ConditionalOnMissingBean(ConfigureHttpSecurity.class)
-    public ConfigureHttpSecurity configureHttpSecurity () {
+    public ConfigureHttpSecurity configureHttpSecurity  () throws Exception {
         return (httpSecurity) -> { };
     }
 
