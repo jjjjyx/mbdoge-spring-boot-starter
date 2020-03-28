@@ -46,6 +46,7 @@ public class ControllerHandlerAdvice {
 
     public ControllerHandlerAdvice(MessageSourceAccessor messageSourceAccessor) {
         this.messageSourceAccessor = messageSourceAccessor;
+        System.out.println("messageSourceAccessor = " + messageSourceAccessor);
     }
 
     /**

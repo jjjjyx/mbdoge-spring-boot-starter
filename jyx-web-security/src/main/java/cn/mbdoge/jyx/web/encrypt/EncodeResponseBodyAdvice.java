@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
-@EnableConfigurationProperties(ApiEncryptProperties.class)
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = "mbdoge.web.api.encrypt",value = "enabled",havingValue = "true")
 @ControllerAdvice

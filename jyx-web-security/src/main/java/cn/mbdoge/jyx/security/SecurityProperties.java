@@ -18,6 +18,25 @@ public class SecurityProperties {
      */
     private String secret = "secret1";
     private String corsUrl = "/api/**";
-    private Map<String, List<String>> permitAll = new HashMap<>();
+    private String apiPrefix = "/api";
+
+    private Jwt jwt = new Jwt();
+
+    @Getter
+    @Setter
+    public static class Jwt {
+        /**
+         * 默认加密秘钥 请务必覆盖！
+         */
+        private String secret = "secret2";
+        /**
+         * 1 小时
+         */
+        private long expiration = 3600L;
+
+        //    private String headerKey = "Authorization";
+        private String redisKeyPrefix = "mbdoge:jti:";
+
+    }
 
 }

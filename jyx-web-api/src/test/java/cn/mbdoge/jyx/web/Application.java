@@ -41,7 +41,7 @@ import java.util.Map;
 @EnableAutoConfiguration
 
 public class Application implements CommandLineRunner {
-    @Resource(name = "apiMessageSourceAccessor")
+    @Resource
     private MessageSourceAccessor messageSourceAccessor;
 
     @GetMapping("/")

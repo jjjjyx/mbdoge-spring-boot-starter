@@ -1,11 +1,9 @@
 package cn.mbdoge.jyx.jwt.filter;
 
-import cn.mbdoge.jyx.jwt.JwtTokenProvider;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import org.springframework.security.core.userdetails.UserDetails;
 
+import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import javax.servlet.http.HttpServletRequest;
+
 
 public class DefaultBearerAuthenticationFilter extends BearerAuthenticationFilterAdapter {
 
@@ -18,8 +16,4 @@ public class DefaultBearerAuthenticationFilter extends BearerAuthenticationFilte
         return super.getToken(request);
     }
 
-    @Override
-    public UserDetails getUserDetails(Jws<Claims> claimsFromToken) {
-        return super.getUserDetails(claimsFromToken);
-    }
 }

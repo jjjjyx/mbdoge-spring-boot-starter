@@ -1,15 +1,10 @@
 package cn.mbdoge.jyx.jwt.filter;
 
+import lombok.extern.slf4j.Slf4j;
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.Constant;
-import cn.mbdoge.jyx.jwt.User;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,8 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFilter {
@@ -39,22 +32,8 @@ public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFi
         return null;
     }
 
-    public UserDetails getUserDetails(Jws<Claims> claimsFromToken) {
-        // 完全信任 token
-        String username = claimsFromToken.getBody().getSubject();
-
-        List<String> roleStrList = (List<String>) claimsFromToken.getBody().get(Constant.CLAIM_KEY_ROLES);
-
-        List<GrantedAuthority> collect = roleStrList.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        User userDetails = new User();
-        userDetails.setUsername(username);
-        userDetails.setAuthorities(collect);
-        return userDetails;
-    }
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-
         String token = getToken(request);
 
         if (token == null) {
@@ -63,9 +42,7 @@ public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFi
         }
 
         try {
-            Jws<Claims> claimsFromToken = jwtTokenProvider.getClaimsFromToken(token);
-            UserDetails userDetails = getUserDetails(claimsFromToken);
-
+            UserDetails userDetails = jwtTokenProvider.getUserDetails(token);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 
             this.logger.trace("Authentication success: " + auth);

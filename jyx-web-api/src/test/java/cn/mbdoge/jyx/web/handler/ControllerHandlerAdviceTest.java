@@ -49,7 +49,7 @@ public class ControllerHandlerAdviceTest {
     @Autowired
     private MockMvc mockMvc; //只需 autowire
 
-    @Resource(name = "apiMessageSourceAccessor")
+    @Resource(name = "messageSourceAccessor")
     private MessageSourceAccessor messageSourceAccessor;
     @BeforeEach
     void setUp() {

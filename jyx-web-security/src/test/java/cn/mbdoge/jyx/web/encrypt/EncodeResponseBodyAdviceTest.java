@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(
         properties = {
                 "logging.level.cn.mbdoge.jyx.web=trace",
-                "mbdoge.api.encrypt.enabled=true"
+                "mbdoge.web.security.api.encrypt.enabled=true"
         }
 )
 @AutoConfigureMockMvc
@@ -61,15 +61,4 @@ class EncodeResponseBodyAdviceTest {
         Assertions.assertEquals(s1, contentAsString);
     }
 
-    @Test
-    void name2() throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
-        String aaa = mapper.writeValueAsString("aaa");
-        System.out.println("aaa = " + aaa);
-
-        String s = mapper.readValue(aaa, String.class);
-
-        System.out.println("s = " + s);
-
-    }
 }

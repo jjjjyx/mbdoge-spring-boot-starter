@@ -1,11 +1,10 @@
 package cn.mbdoge.jyx.web.api;
 
 
+import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
 import cn.mbdoge.jyx.web.language.ApiMessageProperties;
 import cn.mbdoge.jyx.web.language.SmartLocaleResolver;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,16 +13,15 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.servlet.LocaleResolver;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 
 import javax.annotation.PostConstruct;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
 /**
@@ -35,7 +33,7 @@ import java.util.*;
 @EnableConfigurationProperties({ApiMessageProperties.class})
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
-
+@Import(ControllerHandlerAdvice.class)
 public class WebApiAutoConfigure {
 
     private final ApiMessageProperties apiMessageProperties;
@@ -43,6 +41,7 @@ public class WebApiAutoConfigure {
 //    private final ObjectMapper objectMapper;
 
     public WebApiAutoConfigure(ApiMessageProperties apiMessageProperties) {
+
         this.apiMessageProperties = apiMessageProperties;
 //        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
 //        System.out.println("requestMappingHandlerAdapter = " + requestMappingHandlerAdapter);
@@ -123,13 +122,6 @@ public class WebApiAutoConfigure {
 //        requestMappingHandlerAdapter.setResponseBodyAdvice( Collections.singletonList(encodeResponseBodyAdvice()));
     }
 
-//    @ControllerAdvice
-//    @ConditionalOnProperty(prefix = "mbdoge.api.encrypt",value = "enabled",havingValue = "true")
-//    public static class WebEncodeResponseBodyAdvice extends EncodeResponseBodyAdvice {
-//        public WebEncodeResponseBodyAdvice(ApiEncryptProperties properties, ObjectMapper objectMapper) {
-//            super(properties, objectMapper);
-//        }
-//    }
 
 
 // 需要在 应用类注册，这里注册会报 beans 重复错误 ，暂时没有解决办法
@@ -142,8 +134,6 @@ public class WebApiAutoConfigure {
 //        });
 //        return factory;
 //    }
-
-
 
 //    @Override
 //    public void addReturnValueHandlers(final List<HandlerMethodReturnValueHandler> returnValueHandlers) {

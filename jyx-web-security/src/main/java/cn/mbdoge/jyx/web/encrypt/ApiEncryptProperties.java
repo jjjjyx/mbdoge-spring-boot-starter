@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @Setter
-@ConfigurationProperties("mbdoge.web.api.encrypt")
+@ConfigurationProperties("mbdoge.web.security.api.encrypt")
 public class ApiEncryptProperties {
     private boolean enabled = false;
     private String secret = "";

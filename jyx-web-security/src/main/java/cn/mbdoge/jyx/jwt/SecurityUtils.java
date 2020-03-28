@@ -1,7 +1,5 @@
 package cn.mbdoge.jyx.jwt;
 
-
-import cn.mbdoge.jyx.jwt.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,6 +9,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class SecurityUtils {
+    private SecurityUtils() {
+    }
 
     public static String getUsername() {
         Object auto = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
