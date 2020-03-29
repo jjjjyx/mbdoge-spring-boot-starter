@@ -1,7 +1,5 @@
 package cn.mbdoge.jyx.event;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,7 +7,7 @@ import java.util.concurrent.Future;
 
 public final class Dispatch {
 
-    private Map<String, Set<EventCallback>> eventCallbacks = new HashMap<>();
+    private Map<String, List<EventCallback>> eventCallbacks = new HashMap<>();
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
     public Dispatch() {
@@ -27,13 +25,15 @@ public final class Dispatch {
 
 
     protected void listen(String type, EventCallback callBack) {
-        Set<EventCallback> eventCallbackList = this.eventCallbacks.computeIfAbsent(type, k -> new HashSet<>());
-        eventCallbackList.add(callBack);
+        List<EventCallback> eventCallbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
+        if (!eventCallbackList.contains(callBack)) {
+            eventCallbackList.add(callBack);
+        }
 //        log.info("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
     protected void unListen(String type, EventCallback callBack) {
-        Set<EventCallback> eventCallbackList = this.eventCallbacks.get(type);
+        List<EventCallback> eventCallbackList = this.eventCallbacks.get(type);
         if (eventCallbackList != null)
             eventCallbackList.remove(callBack);
 //        log.info("移除监听 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
@@ -68,7 +68,7 @@ public final class Dispatch {
     }
 
     public void once(final String eventNames, final EventCallback eventCallback) {
-        EventCallback eventCallback1 = new EventCallback() {
+        EventCallback temp = new EventCallback() {
             @Override
             public void call(AbstractEvent event) {
                 eventCallback.call(event);
@@ -76,7 +76,7 @@ public final class Dispatch {
             }
         };
 
-        this.on(eventNames, eventCallback1);
+        this.on(eventNames, temp);
     }
 
 
@@ -117,7 +117,7 @@ public final class Dispatch {
 
 //        log.trace("注冊事件 ={}", property.name());
         if(!eventCallbacks.containsKey(property)) {
-            eventCallbacks.put(property,new HashSet<>());
+            eventCallbacks.put(property,new ArrayList<>());
         }
     }
 
@@ -130,7 +130,7 @@ public final class Dispatch {
     }
 
     public int eventSize (String property) {
-        Set<EventCallback> eventCallbackList = this.eventCallbacks.get(property);
+        List<EventCallback> eventCallbackList = this.eventCallbacks.get(property);
         return eventCallbackList == null ? 0 : eventCallbackList.size();
     }
 

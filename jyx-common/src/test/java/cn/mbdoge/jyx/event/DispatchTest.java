@@ -218,7 +218,6 @@ class DispatchTest {
         }
     }
 
-
     enum D implements EventType {
         event,
         init
