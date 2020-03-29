@@ -48,6 +48,52 @@ class DispatchTest {
         assertEquals(0, dispatch.eventSize(D.event));
     }
 
+    @Test
+    @DisplayName("测试事件重复绑定")
+    void name0() {
+        dispatch.addEventName(D.event);
+        EventCallback eventCallback = (e) -> { };
+
+        dispatch.bind(D.event, eventCallback);
+        assertEquals(1, dispatch.eventSize(D.event.name()));
+
+        dispatch.bind(D.event, eventCallback);
+        assertEquals(1, dispatch.eventSize(D.event.name()));
+    }
+
+    @Test
+    @DisplayName("测试once重复绑定")
+    void name01() throws ExecutionException, InterruptedException {
+        dispatch.addEventName(D.event);
+        EventCallback eventCallback1 = (e) -> {
+            System.out.println("1 = " + 1);
+        };
+        EventCallback eventCallback2 = (e) -> {
+            System.out.println("1 = " + 2);
+        };
+
+        EventCallback eventCallback3 = (e) -> {
+            System.out.println("1 = " + 3);
+        };
+
+        EventCallback eventCallback4 = (e) -> {
+            System.out.println("1 = " + 4);
+        };
+
+        dispatch.once(D.event, eventCallback1);
+        dispatch.once(D.event, eventCallback2);
+        dispatch.once(D.event, eventCallback4);
+        dispatch.once(D.event, eventCallback3);
+
+        assertEquals(4, dispatch.eventSize(D.event.name()));
+
+        Event event = new Event(D.event, "abc");
+        Future<Boolean> fire = dispatch.fire(event);
+        Boolean aBoolean = fire.get();
+        assertEquals(0, dispatch.eventSize(D.event));
+
+    }
+
     /**
      * 测试冒泡
      * @throws ExecutionException
