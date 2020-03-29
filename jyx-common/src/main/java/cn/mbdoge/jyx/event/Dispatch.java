@@ -1,82 +1,103 @@
 package cn.mbdoge.jyx.event;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+public final class Dispatch {
 
-public class Dispatch<T extends EventType> {
-
-    private Map<T, List<Callback>> eventCallbacks = new HashMap<>();
+    private Map<String, List<EventCallback>> eventCallbacks = new HashMap<>();
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
-//    protected static String[] parseName (String eventName) {
-//        if (isEmpty(eventName)) {
-//            return new String[0];
-//        }
-//        return eventName.split("\\s+");
-//    }
-//    protected static boolean isEmpty (String str) {
-//        return (str == null || "".equals(str));
-//    }
+    public Dispatch() {
+    }
+    protected static String[] parseName (String eventName) {
+        if (isEmpty(eventName)) {
+            return new String[0];
+        }
+        return eventName.split("[\\s,]+");
+    }
+
+    protected static boolean isEmpty (String str) {
+        return (str == null || "".equals(str));
+    }
 
 
-    protected void listen(T type, Callback callBack) {
-        List<Callback> callbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
-        callbackList.add(callBack);
+    protected void listen(String type, EventCallback callBack) {
+        List<EventCallback> eventCallbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
+        eventCallbackList.add(callBack);
 //        log.info("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
-    public void on(T type, Callback callBack){
-//        String[] names = parseName(eventName);
-//        for (String name : names) {
-//
-//        }
-        this.listen(type, callBack);
-
+    protected void unListen(String type, EventCallback callBack) {
+        List<EventCallback> eventCallbackList = this.eventCallbacks.get(type);
+        if (eventCallbackList != null)
+            eventCallbackList.remove(callBack);
+//        log.info("移除监听 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
-    public void off(T type, Callback callBack){
-//        String[] names = parseName(eventName);
-//        for (String name : names) {
 
-//        }
+    public void bind(EventType eventType, EventCallback callBack) {
+        this.listen(eventType.name(), callBack);
+    }
+
+    public void on(String eventNames, EventCallback callBack){
+        String[] names = parseName(eventNames);
+        for (String name : names) {
+            this.listen(name, callBack);
+        }
+    }
+
+    public void unbind(EventType eventType, EventCallback callBack) {
+        this.unListen(eventType.name(), callBack);
+    }
+
+    public void off(String eventNames, EventCallback callBack){
+        String[] names = parseName(eventNames);
+        for (String name : names) {
+            this.unListen(name, callBack);
+        }
 //        log.trace("取消监听事件 = eventName = {}, callback = {}", type.name(), callBack.toString());
-        List<Callback> callbackList = this.eventCallbacks.get(type);
-        if (callbackList != null)
-            callbackList.remove(callBack);
+
     }
 
-    public void once(T type, final Callback callback) {
-        Callback callback1 = new Callback() {
+    public void once(final EventType eventNames, final EventCallback eventCallback) {
+        this.once(eventNames.name(), eventCallback);
+    }
+
+    public void once(final String eventNames, final EventCallback eventCallback) {
+        EventCallback eventCallback1 = new EventCallback() {
             @Override
-            public void call(Event event) {
-                off(type, this);
-                callback.call(event);
+            public void call(AbstractEvent event) {
+                off(eventNames, this);
+                eventCallback.call(event);
             }
         };
 
-        this.on(type, callback1);
+        this.on(eventNames, eventCallback1);
     }
 
 
-    public Future<Boolean> fire(final T type, Map<String, Object> data) {
-        Objects.requireNonNull(type);
-//        log.trace("触发事件 = eventName = {}, args.size = {}", type.name(), data.size());
+//    public Future<Boolean> fire(final T event, Map<String, Object> data) {
+    public Future<Boolean> fire(final AbstractEvent event) {
+        Objects.requireNonNull(event);
+//        log.trace("触发事件 = eventName = {}, args.size = {}", event.name(), data.size());
         return executorService.submit(() -> {
-
-            List<Callback> callbackList = this.eventCallbacks.get(type);
-            if (callbackList == null || callbackList.size() == 0) {
-//                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", type.name(), callbackList);
+            String key = event.getType();
+            List<EventCallback> eventCallbackList = this.eventCallbacks.get(key);
+            if (eventCallbackList == null || eventCallbackList.size() == 0) {
+//                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", event.name(), callbackList);
                 return false;
             }
-//            log.trace("事件 {} 响应列表 size = {}", type.name(), callbackList.size());
+//            log.trace("事件 {} 响应列表 size = {}", event.name(), callbackList.size());
 
-            Event event = new Event(type, data);
-            event.setTime(System.currentTimeMillis());
+//            AbstractEvent abstractEvent = new AbstractEvent(event);
+//            abstractEvent.setData(data);
 
-            for (Callback callback : callbackList) {
-                callback.call(event);
+            for (EventCallback eventCallback : eventCallbackList) {
+                eventCallback.call(event);
                 if(event.shouldStopPropagationImmediately()) {
                     break;
                 }
@@ -89,32 +110,11 @@ public class Dispatch<T extends EventType> {
 //        return this.fire(eventName, toMap(paramNames, args));
 //    }
 
-    public Future<Boolean> fire(final T type, Object... args) {
-        return this.fire(type, toMap(type.getNames(), args));
-    }
+//    public Future<Boolean> fire(final String type, Object... args) {
+//        return this.fire(type, toMap(type.getNames(), args));
+//    }
 
-    protected Map<String, Object> toMap(String[] paramNames, Object... args) {
-//        int index = 0;
-        if (null == paramNames) {
-            paramNames = new String[0];
-        }
-
-        Map<String, Object> data = new HashMap<>();
-        int argsLength = args.length;
-        int nameLength = paramNames.length;
-        for (int i = 0; i < nameLength && i < argsLength; i++) {
-            data.put(paramNames[i], args[i]);
-        }
-
-        for (int i = nameLength; i < argsLength; i++) {
-            data.put(String.valueOf(i), args[i]);
-        }
-//        log.trace("paramNames length = {} args length = {}, paramNames = {}", nameLength, argsLength, data.keySet());
-
-        return data;
-    }
-
-    public void addEventName(T property) {
+    public void addEventName(String property) {
         Objects.requireNonNull(property);
 
 //        log.trace("注冊事件 ={}", property.name());
@@ -123,13 +123,21 @@ public class Dispatch<T extends EventType> {
         }
     }
 
+    public void addEventName(EventType eventType) {
+       this.addEventName(eventType.name());
+    }
+
     public int eventSize () {
         return this.eventCallbacks.size();
     }
 
-    public int eventSize (T property) {
-        List<Callback> callbackList = this.eventCallbacks.get(property);
-        return callbackList == null ? 0 : callbackList.size();
+    public int eventSize (String property) {
+        List<EventCallback> eventCallbackList = this.eventCallbacks.get(property);
+        return eventCallbackList == null ? 0 : eventCallbackList.size();
+    }
+
+    public int eventSize (EventType eventType) {
+        return eventSize(eventType.name());
     }
 
 }
