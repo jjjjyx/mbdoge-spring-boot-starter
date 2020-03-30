@@ -70,9 +70,15 @@ public final class Dispatch {
     public void once(final String eventNames, final EventCallback eventCallback) {
         EventCallback eventCallback1 = new EventCallback() {
             @Override
-            public void call(AbstractEvent event) {
-                eventCallback.call(event);
-                off(eventNames, this);
+            public void call(AbstractEvent event) throws Exception {
+                try {
+                    eventCallback.call(event);
+                } catch (Exception e) {
+                    throw e;
+                } finally {
+                    off(eventNames, this);
+                }
+
             }
         };
 
@@ -94,7 +100,10 @@ public final class Dispatch {
             }
 //            log.trace("事件 {} 响应列表 size = {}", event.name(), callbackList.size());
             for (EventCallback eventCallback : eventCallbackList) {
-                eventCallback.call(event);
+                try {
+                    eventCallback.call(event);
+                } catch (Exception ignored) {
+                }
                 if (event.shouldStopPropagationImmediately()) {
                     break;
                 }

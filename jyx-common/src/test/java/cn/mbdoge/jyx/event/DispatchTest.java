@@ -91,6 +91,48 @@ class DispatchTest {
         Future<Boolean> fire = dispatch.fire(event);
         Boolean aBoolean = fire.get();
         assertEquals(0, dispatch.eventSize(D.event));
+    }
+
+    @Test
+    @DisplayName("测试事件中的异常")
+    void name02() throws ExecutionException, InterruptedException {
+
+        dispatch.addEventName(D.event);
+        AtomicInteger i = new AtomicInteger();
+        EventCallback eventCallback1 = (e) -> {
+            System.out.println("1 = " + 1);
+            i.getAndIncrement();
+            throw new Exception("xxx");
+        };
+        EventCallback eventCallback2 = (e) -> {
+            System.out.println("1 = " + 2);
+            i.getAndIncrement();
+            throw new Exception("xxx");
+        };
+
+        EventCallback eventCallback3 = (e) -> {
+            System.out.println("1 = " + 3);
+            i.getAndIncrement();
+        };
+
+        EventCallback eventCallback4 = (e) -> {
+            System.out.println("1 = " + 4);
+            i.getAndIncrement();
+        };
+
+        dispatch.once(D.event, eventCallback1);
+        dispatch.once(D.event, eventCallback2);
+        dispatch.once(D.event, eventCallback4);
+        dispatch.once(D.event, eventCallback3);
+
+        assertEquals(4, dispatch.eventSize(D.event.name()));
+
+        Event event = new Event(D.event, "abc");
+        Future<Boolean> fire = dispatch.fire(event);
+
+        Boolean aBoolean = fire.get();
+        assertEquals(0, dispatch.eventSize(D.event));
+        assertEquals(4, i.get());
 
     }
 
