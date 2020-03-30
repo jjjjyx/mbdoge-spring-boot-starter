@@ -39,4 +39,29 @@ public final class SecurityUtils {
         }
         return null;
     }
+
+    public static boolean hasRole(String role){
+        return hasRole(getUser(), role);
+    }
+
+    public static boolean hasRole(User user,String role){
+        if (user == null || role == null) {
+            return false;
+        }
+
+        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+
+        if (authorities == null) {
+            return false;
+        }
+
+        for (GrantedAuthority grantedAuthority : authorities) {
+            if (role.equals(grantedAuthority.getAuthority())) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
 }
