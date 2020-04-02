@@ -22,6 +22,7 @@ import org.springframework.web.servlet.LocaleResolver;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 主要是做一些常用的全局配置，减少重复的代码
@@ -91,7 +92,14 @@ public class WebApiAutoConfigure {
         if (languages.isEmpty()) {
             return new SmartLocaleResolver();
         }
-        return new SmartLocaleResolver();
+        return new SmartLocaleResolver(languages.stream().map(i -> {
+            String[] split = i.split("-");
+            if (split.length == 2) {
+                return new Locale(split[0], split[1]);
+            } else {
+                return new Locale(i);
+            }
+        }).collect(Collectors.toList()));
     }
 
 

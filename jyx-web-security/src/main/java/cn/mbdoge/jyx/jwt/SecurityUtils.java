@@ -62,6 +62,18 @@ public final class SecurityUtils {
         }
 
         return false;
+    }
 
+    public static boolean hasAnyRoles(User user, String... roles) {
+        if (roles.length == 0) {
+            return false;
+        }
+        for (String role : roles) {
+            boolean b = hasRole(user, role);
+            if (b) {
+                return true;
+            }
+        }
+        return false;
     }
 }
