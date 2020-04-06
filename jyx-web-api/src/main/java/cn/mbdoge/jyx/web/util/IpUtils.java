@@ -18,32 +18,31 @@ public final class IpUtils {
     private static final String LOCAL_IP = "127.0.0.1";
     private static final String GEO_URL = "http://ip-api.com/json/";
     private static final String QUERY_API_SUCCESS_FLAG = "success";
-
+    private static final String UNKNOWN = "unknown";
     /**
      * 获取请求中的真实 ip 地址
      * @param request
      * @return
      */
     public static String getRequestRealAddress(HttpServletRequest request) {
-        String unknown = "unknown";
+
         if (request == null) {
-            return unknown;
+            return UNKNOWN;
         }
         String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("X-Forwarded-For");
         }
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("X-Real-IP");
         }
-
-        if (ip == null || ip.length() == 0 || unknown.equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
         }
 

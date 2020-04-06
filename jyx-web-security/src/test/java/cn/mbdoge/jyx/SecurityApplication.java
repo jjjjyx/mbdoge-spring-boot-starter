@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -34,15 +33,15 @@ public class SecurityApplication implements CommandLineRunner {
     public void run(String... args) throws Exception {
 //        WebMvcAutoConfiguration
 //        System.out.println(Arrays.toString(args));
-        String key = "mbdoge:jti:*";
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
-        objectOutputStream.writeObject(key);
-        objectOutputStream.flush();
-        byte[] bytes = byteArrayOutputStream.toByteArray();
-
-        Set<String> keys = redisTemplate.keys("\\xac\\xed\\x00\\x05t\\x006mbdoge:jti:jjjjyx:*");
-        System.out.println("keys = " + keys);
+//        String key = "mbdoge:jti:*";
+//        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+//        objectOutputStream.writeObject(key);
+//        objectOutputStream.flush();
+//        byte[] bytes = byteArrayOutputStream.toByteArray();
+//
+//        Set<String> keys = redisTemplate.keys("\\xac\\xed\\x00\\x05t\\x006mbdoge:jti:jjjjyx:*");
+//        System.out.println("keys = " + keys);
     }
 
 
@@ -94,10 +93,6 @@ public class SecurityApplication implements CommandLineRunner {
         }
     }
 
-    @Bean
-    public ConfigurableServletWebServerFactory webServerFactory() {
-        return new WebServerFactory();
-    }
 
     public static void main(String[] args) {
 

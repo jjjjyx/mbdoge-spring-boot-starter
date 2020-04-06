@@ -2,7 +2,6 @@ package cn.mbdoge.jyx;
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.User;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,13 +11,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 @Controller
-
 public class Contorller {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -31,7 +28,7 @@ public class Contorller {
     @GetMapping("/a/input2")
     @ResponseBody
 //    @PreAuthorize("isAuthenticated()")
-    @PreAuthorize("isAuthenticated()")
+//    @PreAuthorize("isAuthenticated()")
     public Map input2(@RequestParam(name = "test") String test){
         String s = "aaa";
         Map m = new HashMap();
@@ -43,8 +40,6 @@ public class Contorller {
 
     @GetMapping(value = "/a/login")
     @ResponseBody
-//    @PreAuthorize("isAuthenticated()")
-//    @PreAuthorize("isAuthenticated()")
     public String login(@RequestParam(name = "test") String test){
         System.out.println("test = " + test);
         UsernamePasswordAuthenticationToken upToken = new UsernamePasswordAuthenticationToken(test, test);

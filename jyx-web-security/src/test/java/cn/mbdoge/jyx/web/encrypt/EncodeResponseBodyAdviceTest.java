@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -37,10 +38,11 @@ class EncodeResponseBodyAdviceTest {
     }
 
     @Test
+    @DisplayName("测试api 加密")
     void name() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
-                        .get("/input2");
+                        .get("/a/input2");
 
         mockHttpServletRequestBuilder.param("test", "xxx");
 //        mockHttpServletRequestBuilder.param("aa[]", "xxx");
@@ -61,4 +63,21 @@ class EncodeResponseBodyAdviceTest {
         Assertions.assertEquals(s1, contentAsString);
     }
 
+    @Test
+    void name2() throws Exception {
+        MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
+                MockMvcRequestBuilders
+                        .get("/a/login");
+
+        mockHttpServletRequestBuilder.param("test", "xxx");
+
+        String contentAsString = mockMvc.perform(mockHttpServletRequestBuilder)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+
+        Assertions.assertTrue(contentAsString.startsWith("\""));
+        Assertions.assertTrue(contentAsString.endsWith("\""));
+    }
 }

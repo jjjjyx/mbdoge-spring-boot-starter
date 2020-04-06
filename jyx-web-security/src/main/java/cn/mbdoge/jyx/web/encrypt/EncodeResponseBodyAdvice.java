@@ -43,7 +43,8 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest srequest, ServerHttpResponse response) {
         ServletServerHttpRequest temp = (ServletServerHttpRequest) srequest;
         HttpServletRequest req = temp.getServletRequest();
-        if (selectedContentType.equals(MediaType.APPLICATION_JSON) || selectedContentType.equals(MediaType.TEXT_PLAIN_VALUE)) {
+
+        if (selectedContentType.equals(MediaType.APPLICATION_JSON) || selectedContentType.equals(MediaType.TEXT_PLAIN)) {
             Object obj = body;
             if (obj instanceof MappingJacksonValue) {
                 obj = ((MappingJacksonValue) obj).getValue();
