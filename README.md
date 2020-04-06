@@ -31,6 +31,7 @@ spring.mvc.locale-resolver=accept_header
 
 ## web-security
 1. 修复了 `EncodeResponseBodyAdvice#47L` 的检查错误 `TEXT_PLAIN_VALUE -> TEXT_PLAIN`
+2. 修复了 `AccessExceptionAdvice` 中定义的异常拦截，被覆盖的问题，调整了该类的order 级别
 
 
 # 0.0.1 版本 测试版 单纯的将常规项目中的公共模块进行了整理
