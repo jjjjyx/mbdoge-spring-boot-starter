@@ -32,6 +32,6 @@ spring.mvc.locale-resolver=accept_header
 ## web-security
 1. 修复了 `EncodeResponseBodyAdvice#47L` 的检查错误 `TEXT_PLAIN_VALUE -> TEXT_PLAIN`
 2. 修复了 `AccessExceptionAdvice` 中定义的异常拦截，被覆盖的问题，调整了该类的order 级别
-
+3. 修改了 `CustomDaoAuthenticationProvider` 使用 MessageSource 作为构造参数，使用 `MessageSourceAccessor` 会获取不到使用者传入的`spring.messages.basename`
 
 # 0.0.1 版本 测试版 单纯的将常规项目中的公共模块进行了整理

@@ -16,11 +16,11 @@ import java.util.Locale;
 
 public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
-    public CustomDaoAuthenticationProvider(MessageSourceAccessor messageSourceAccessor,
+    public CustomDaoAuthenticationProvider(MessageSource messageSource,
             PasswordEncoder passwordEncoder,
             UserDetailsService userDetailsService
     ) {
-        this.messages = messageSourceAccessor;
+        this.messages = new MessageSourceAccessor(messageSource);
         this.setPasswordEncoder(passwordEncoder);
         this.setUserDetailsService(userDetailsService);
     }

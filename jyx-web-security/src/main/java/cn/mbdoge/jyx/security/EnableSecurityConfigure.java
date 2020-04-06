@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -76,10 +77,10 @@ public class EnableSecurityConfigure {
     @Bean(name = "customDaoAuthenticationProvider")
     @ConditionalOnMissingBean(CustomDaoAuthenticationProvider.class)
     public CustomDaoAuthenticationProvider customDaoAuthenticationProvider(
-            MessageSourceAccessor messageSourceAccessor,
+            MessageSource messageSource,
             PasswordEncoder passwordEncoder,
             UserDetailsService userDetailsService
     ) {
-        return new CustomDaoAuthenticationProvider(messageSourceAccessor, passwordEncoder, userDetailsService);
+        return new CustomDaoAuthenticationProvider(messageSource, passwordEncoder, userDetailsService);
     }
 }
