@@ -57,7 +57,7 @@ public class EnableSecurityConfigure {
         };
     }
     //    @Autowired
-//    @Qualifier("webMessageSourceAccessor")
+
 //    private MessageSourceAccessor messageSourceAccessor;
     @Bean(name = "bearerAuthenticationFilterAdapter")
     @ConditionalOnMissingBean(BearerAuthenticationFilterAdapter.class)
@@ -76,7 +76,7 @@ public class EnableSecurityConfigure {
     @Bean(name = "customDaoAuthenticationProvider")
     @ConditionalOnMissingBean(CustomDaoAuthenticationProvider.class)
     public CustomDaoAuthenticationProvider customDaoAuthenticationProvider(
-            @Qualifier("webMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor,
+            MessageSourceAccessor messageSourceAccessor,
             PasswordEncoder passwordEncoder,
             UserDetailsService userDetailsService
     ) {

@@ -43,7 +43,7 @@ public class RelatedBeanConfigure {
     @Bean
     public JwtTokenProvider jwtTokenProvider (
             RedisTemplate<String, Object> redisTemplate,
-            @Qualifier("webMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor) {
+            MessageSourceAccessor messageSourceAccessor) {
         return new JwtTokenProvider(webSecurityProperties, redisTemplate, messageSourceAccessor);
     }
 

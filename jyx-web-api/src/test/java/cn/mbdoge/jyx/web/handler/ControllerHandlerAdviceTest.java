@@ -2,8 +2,10 @@ package cn.mbdoge.jyx.web.handler;
 
 
 import cn.mbdoge.jyx.exception.LocalServiceException;
+import cn.mbdoge.jyx.web.Application;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,8 +53,8 @@ public class ControllerHandlerAdviceTest {
     private MockMvc mockMvc; //只需 autowire
 
     @Autowired
-    @Qualifier("webMessageSourceAccessor")
     private MessageSourceAccessor messageSourceAccessor;
+
     @BeforeEach
     void setUp() {
     }
@@ -62,6 +64,7 @@ public class ControllerHandlerAdviceTest {
      * @throws Exception
      */
     @Test
+    @DisplayName("测试 404 错误")
     public void noHandlerFoundException() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.post("/aaa"))
                 .andDo(print())
@@ -77,6 +80,7 @@ public class ControllerHandlerAdviceTest {
      * @throws Exception
      */
     @Test
+    @DisplayName("测试 404 错误 i18n")
     public void languageTest() throws Exception {
 
         String message = messageSourceAccessor.getMessage("controller.404", Locale.SIMPLIFIED_CHINESE);
@@ -102,6 +106,7 @@ public class ControllerHandlerAdviceTest {
      * @see cn.mbdoge.jyx.web.Application#input2(String)
      */
     @Test
+    @DisplayName("缺少参数错误")
     public void handleMissingServletRequestParameterException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -131,6 +136,7 @@ public class ControllerHandlerAdviceTest {
      * @see cn.mbdoge.jyx.web.Application#input3(cn.mbdoge.jyx.web.Application.A)
      */
     @Test
+    @DisplayName("参数验证失败 HttpMessageNotReadable")
     public void handleHttpMessageNotReadableException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -164,7 +170,12 @@ public class ControllerHandlerAdviceTest {
         Assertions.assertNull(dd.getResolvedException());
     }
 
+    /**
+     * @see cn.mbdoge.jyx.web.Application#input4(cn.mbdoge.jyx.web.Application.B)
+     * @throws Exception
+     */
     @Test
+    @DisplayName("参数验证失败 MethodArgumentNotValid")
     public void handleMethodArgumentNotValidException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -198,7 +209,12 @@ public class ControllerHandlerAdviceTest {
         Assertions.assertNull(mvcResult1.getResolvedException());
     }
 
+    /**
+     * @see cn.mbdoge.jyx.web.Application#input5(cn.mbdoge.jyx.web.Application.B)
+     * @throws Exception
+     */
     @Test
+    @DisplayName("参数验证失败 BindException")
     public void handleBindException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -234,7 +250,12 @@ public class ControllerHandlerAdviceTest {
         Assertions.assertNull(mvcResult1.getResolvedException());
     }
 
+    /**
+     * @see cn.mbdoge.jyx.web.Application#input6(int, boolean, Application.M)
+     * @throws Exception
+     */
     @Test
+    @DisplayName("参数类型错误 MethodArgumentTypeMismatch")
     public void handleMethodArgumentTypeMismatchException() throws Exception {
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
@@ -295,7 +316,12 @@ public class ControllerHandlerAdviceTest {
 
 
 
+    /**
+     * @see Application.CC#input10
+     * @throws Exception
+     */
     @Test
+    @DisplayName("参数验证失败 ConstraintViolation")
     public void handleConstraintViolationException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -336,6 +362,7 @@ public class ControllerHandlerAdviceTest {
      * @throws Exception
      */
     @Test
+    @DisplayName("请求方式 错误")
     public void handleHttpRequestMethodNotSupportedException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -354,6 +381,7 @@ public class ControllerHandlerAdviceTest {
     }
 
     @Test
+    @DisplayName("请求格式错误 HttpMediaTypeNotSupported")
     public void handleHttpMediaTypeNotSupportedException() throws Exception {
 
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
@@ -386,6 +414,7 @@ public class ControllerHandlerAdviceTest {
     }
 
     @Test
+    @DisplayName("上传文件")
     public void handleMultipartException() throws Exception {
         MockMultipartFile firstFile = new MockMultipartFile("data", "filename.txt", "text/plain", "some xml".getBytes());
         MockMultipartFile secondFile = new MockMultipartFile("data", "other-file-name.data", "text/plain", "some other type".getBytes());
@@ -416,6 +445,7 @@ public class ControllerHandlerAdviceTest {
     }
 
     @Test
+    @DisplayName("localService 自定义业务异常")
     public void handleServiceException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders
@@ -434,6 +464,7 @@ public class ControllerHandlerAdviceTest {
     }
 
     @Test
+    @DisplayName("其他异常 500")
     public void handleException() throws Exception {
         MockHttpServletRequestBuilder mockHttpServletRequestBuilder =
                 MockMvcRequestBuilders

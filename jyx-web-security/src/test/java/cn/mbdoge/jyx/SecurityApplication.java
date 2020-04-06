@@ -4,8 +4,6 @@ import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.User;
 import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.security.ConfigureHttpSecurity;
-import cn.mbdoge.jyx.security.EnableSecurityConfigure;
-import cn.mbdoge.jyx.web.tomcat.WebServerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

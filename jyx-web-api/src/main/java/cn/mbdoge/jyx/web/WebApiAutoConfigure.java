@@ -2,114 +2,50 @@ package cn.mbdoge.jyx.web;
 
 
 import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
-import cn.mbdoge.jyx.web.language.SmartLocaleResolver;
+import cn.mbdoge.jyx.web.language.LanguageConfigure;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.Ordered;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.web.servlet.LocaleResolver;
 
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 主要是做一些常用的全局配置，减少重复的代码
+ *
  * @author jyx
  */
 @Slf4j
-@Configuration(proxyBeanMethods =false)
-@EnableConfigurationProperties({WebApiProperties.class})
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
-@Import(ControllerHandlerAdvice.class)
+@Import({LanguageConfigure.class, ControllerHandlerAdvice.class})
 public class WebApiAutoConfigure {
 
-    private final WebApiProperties webApiProperties;
-//    private final ApiEncryptProperties apiEncryptProperties;
-//    private final ObjectMapper objectMapper;
 
-    public WebApiAutoConfigure(WebApiProperties webApiProperties) {
-
-        this.webApiProperties = webApiProperties;
-//        this.requestMappingHandlerAdapter = requestMappingHandlerAdapter;
-//        System.out.println("requestMappingHandlerAdapter = " + requestMappingHandlerAdapter);
-
-//        requestMappingHandlerAdapter.setResponseBodyAdvice(Collections.singletonList(encodeResponseBodyAdvice()));
-//        requestMappingHandlerAdapter.afterPropertiesSet();
-//        this.apiEncryptProperties = apiEncryptProperties;
-//        this.objectMapper = objectMapper;
-//        WebMvcConfigurer
+    public WebApiAutoConfigure() {
+//        this.webApiProperties = webApiProperties;
     }
-
-
-    /**
-     * 配置api的 多语言
-     * @return
-     */
-    @Bean(name = "webMessageSource")
-    public MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-//        messageSource.addBasenames("classpath:org/springframework/security/messages");
-        List<String> source = webApiProperties.getMessage().getSource();
-        for (String s : source) {
-            messageSource.addBasenames(s);
-        }
-
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
-    }
-
-    /**
-     * 配置api的 多语言
-     * @return
-     * @see cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice
-     */
-    @Bean(name = "webMessageSourceAccessor")
-    public MessageSourceAccessor messageSourceAccessor(@Qualifier("webMessageSource") MessageSource messageSource) {
-        return new MessageSourceAccessor(messageSource);
-    }
-
-    /**
-     * 配置多语言使用，根据请求中的header = Accept-Language 来决定使用什么语言
-     * @return ControllerHandlerAdvice
-     */
-    @Bean
-    @ConditionalOnMissingBean(LocaleResolver.class)
-    public LocaleResolver localeResolver() {
-        List<String> languages = webApiProperties.getMessage().getLanguages();
-        if (languages.isEmpty()) {
-            return new SmartLocaleResolver();
-        }
-        return new SmartLocaleResolver(languages.stream().map(i -> {
-            String[] split = i.split("-");
-            if (split.length == 2) {
-                return new Locale(split[0], split[1]);
-            } else {
-                return new Locale(i);
-            }
-        }).collect(Collectors.toList()));
-    }
-
 
     /**
      * 让验证时快熟失效
      * 当验证多个字段时，第一个错误字段出现，后续的不在验证
+     *
      * @return
      */
     @Bean
-    public LocalValidatorFactoryBean localValidator(@Qualifier("webMessageSource") MessageSource messageSource) {
+    public LocalValidatorFactoryBean localValidator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource);
         Map<String, String> map = new HashMap<>(1);
@@ -119,66 +55,18 @@ public class WebApiAutoConfigure {
     }
 
 
-
-//    @ConditionalOnProperty(prefix = "mbdoge.api.encrypt",value = "enabled",havingValue = "true")
-//    @PostConstruct
-//    public void init () {
-//
-////        requestMappingHandlerAdapter.afterPropertiesSet();
-////        requestMappingHandlerAdapter.setResponseBodyAdvice( Collections.singletonList(encodeResponseBodyAdvice()));
-//    }
-
-
-
-// 需要在 应用类注册，这里注册会报 beans 重复错误 ，暂时没有解决办法
-//    @Bean
-//    public TomcatServletWebServerFactory tomcatServletWebServerFactory() {
-//        TomcatServletWebServerFactory factory = new TomcatServletWebServerFactory();
-//        factory.addConnectorCustomizers(connector -> {
-//            connector.setProperty("relaxedPathChars", "\"<>[\\]^`{|}");
-//            connector.setProperty("relaxedQueryChars", "\"<>[\\]^`{|}");
-//        });
-//        return factory;
-//    }
-
-//    @Override
-//    public void addReturnValueHandlers(final List<HandlerMethodReturnValueHandler> returnValueHandlers) {
-//        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
-//        messageConverters.add(new MappingJackson2HttpMessageConverter());
-//        returnValueHandlers.add(new ApiEncryptReturnValueHandler(messageConverters));
-//    }
-
-//    @Override
-//    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-////        List<ApiEncryptHttpMessageConverter> apiEncryptHttpMessageConverters = Collections.singletonList();
-//        converters.add(new ApiEncryptHttpMessageConverter());
-//
-//    }
-
-//    @Override
-//    public void addReturnValueHandlers(List<HandlerMethodReturnValueHandler> handlers) {
-//        handlers.add(new ApiEncryptReturnValueHandler());
-//    }
-
-
-    //    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry
-//                .addInterceptor(new ApiEncryptFilter())
-//                .addPathPatterns("/**");
-//    }
-
-    //    @Override
-//    public RequestMappingHandlerAdapter requestMappingHandlerAdapter(@Qualifier("mvcContentNegotiationManager") ContentNegotiationManager contentNegotiationManager,
-//                                                                     @Qualifier("mvcConversionService") FormattingConversionService conversionService,
-//                                                                     @Qualifier("mvcValidator") Validator validator) {
-//        System.out.println("111 = " + 111);
-//        RequestMappingHandlerAdapter requestMappingHandlerAdapter = super.requestMappingHandlerAdapter(contentNegotiationManager, conversionService, validator);
-//
-//        log.info("是否开启api请求 结果加密a = {}", properties.isEnabled());
-//        if (properties.isEnabled()) {
-//            requestMappingHandlerAdapter.setResponseBodyAdvice(Collections.singletonList(new EncodeResponseBodyAdvice(properties, objectMapper)));
-//        }
-//        return requestMappingHandlerAdapter;
-//    }
+    /**
+     * 解决 url 查询参数中特殊字符的问题
+     * @link https://stackoverflow.com/questions/51703746/setting-relaxedquerychars-for-embedded-tomcat
+     * @return
+     */
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> containerCustomizer() {
+        return factory -> {
+            factory.addConnectorCustomizers(connector -> {
+                connector.setAttribute("relaxedPathChars", "<>[\\]^`{|}");
+                connector.setAttribute("relaxedQueryChars", "<>[\\]^`{|}");
+            });
+        };
+    }
 }

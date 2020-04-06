@@ -1,19 +1,11 @@
 package cn.mbdoge.jyx.web;
 
 import cn.mbdoge.jyx.exception.LocalServiceException;
-import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
 import cn.mbdoge.jyx.web.handler.ControllerHandlerAdviceTest;
-import cn.mbdoge.jyx.web.tomcat.WebServerFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.MessageSourceAccessor;
 
@@ -21,13 +13,10 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import java.io.IOException;
@@ -39,12 +28,36 @@ import java.util.Map;
 @SpringBootApplication()
 @Controller
 @Configuration
-@EnableAutoConfiguration
-
 public class Application implements CommandLineRunner {
+
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+
+    //    @Bean
+//    public ConfigurableServletWebServerFactory webServerFactory() {
+//        return new WebServerFactory();
+//    }
+//
+    @Override
+    public void run(String... args) throws Exception {
+    }
+
+
     @Autowired
-    @Qualifier("webMessageSourceAccessor")
     private MessageSourceAccessor messageSourceAccessor;
+
+    @GetMapping("/language")
+    @ResponseBody
+    public Map language(HttpServletRequest request, @RequestParam(name = "code", required = false, defaultValue = "upload.fail") String code){
+        String header = request.getHeader("Accept-Language");
+        String message = messageSourceAccessor.getMessage(code, "多语言测试");
+        Map m = new HashMap();
+        m.put("lang", header);
+        m.put("msg", message);
+        return m;
+    }
 
     @GetMapping("/")
     public String index(){
@@ -148,7 +161,7 @@ public class Application implements CommandLineRunner {
 
     @PostMapping("/input6")
     @ResponseBody
-    public Map input5(@RequestParam("a") int a, boolean c, M m)  {
+    public Map input6(@RequestParam("a") int a, boolean c, M m)  {
         Map ma = new HashMap();
         ma.put("d", a);
         ma.put("m", m);
@@ -194,19 +207,6 @@ public class Application implements CommandLineRunner {
     public Map input12() throws IOException {
 
         throw new IOException("xxx");
-    }
-
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
-    @Bean
-    public ConfigurableServletWebServerFactory webServerFactory() {
-        return new WebServerFactory();
-    }
-//
-    @Override
-    public void run(String... args) throws Exception {
     }
 
     /**
@@ -273,7 +273,7 @@ public class Application implements CommandLineRunner {
 
     @Controller
     @Validated
-    class CC {
+    public static class CC {
 
         @PostMapping("/input10")
         @ResponseBody

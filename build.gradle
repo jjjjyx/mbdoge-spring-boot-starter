@@ -30,7 +30,7 @@ def localRepositoryPath = 'file://' + new File(System.getProperty('user.home'), 
 
 subprojects {
     group = 'cn.mbdoge.jyx'
-    version = '0.0.1'
+    version = '0.0.2'
 
     apply plugin: 'maven'
 //    apply plugin: 'io.spring.dependency-management'

@@ -1,4 +1,4 @@
-package cn.mbdoge.jyx.web;
+package cn.mbdoge.jyx.web.util;
 
 /**
  * @author jyx

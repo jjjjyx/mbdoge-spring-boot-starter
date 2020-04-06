@@ -1,6 +1,5 @@
 package cn.mbdoge.jyx.web.util;
 
-import cn.mbdoge.jyx.web.AnalyzeIpGeoException;
 import cn.mbdoge.jyx.web.model.IpGeoVO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

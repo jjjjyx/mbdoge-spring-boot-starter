@@ -29,7 +29,7 @@ public class JwtTokenProvider {
     private final MessageSourceAccessor message;
 
 
-    public JwtTokenProvider(WebSecurityProperties webSecurityProperties, RedisTemplate<String, Object> redisTemplate, @Qualifier("webMessageSourceAccessor") MessageSourceAccessor messageSourceAccessor) {
+    public JwtTokenProvider(WebSecurityProperties webSecurityProperties, RedisTemplate<String, Object> redisTemplate, MessageSourceAccessor messageSourceAccessor) {
         this.jwt = webSecurityProperties.getJwt();
         this.redisTemplate = redisTemplate;
         this.message = messageSourceAccessor;
