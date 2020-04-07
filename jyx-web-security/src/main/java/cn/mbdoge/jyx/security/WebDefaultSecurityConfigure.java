@@ -67,8 +67,8 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Autowired
     private BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter;
 
-    @Autowired
-    private CustomDaoAuthenticationProvider customDaoAuthenticationProvider;
+    @Autowired @Qualifier("customDaoAuthenticationProvider")
+    private DaoAuthenticationProvider customDaoAuthenticationProvider;
 
 
 //    @Autowired

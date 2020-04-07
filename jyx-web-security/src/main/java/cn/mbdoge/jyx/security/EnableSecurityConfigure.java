@@ -75,12 +75,12 @@ public class EnableSecurityConfigure {
     }
 
     @Bean(name = "customDaoAuthenticationProvider")
-    @ConditionalOnMissingBean(CustomDaoAuthenticationProvider.class)
-    public CustomDaoAuthenticationProvider customDaoAuthenticationProvider(
-            MessageSource messageSource,
-            PasswordEncoder passwordEncoder,
-            UserDetailsService userDetailsService
-    ) {
-        return new CustomDaoAuthenticationProvider(messageSource, passwordEncoder, userDetailsService);
+    @ConditionalOnMissingBean(DaoAuthenticationProvider.class)
+    public DaoAuthenticationProvider customDaoAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+        daoAuthenticationProvider.setUserDetailsService(userDetailsService);
+
+        return daoAuthenticationProvider;
     }
 }
