@@ -59,7 +59,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String createToken(UserDetails userDetails, String id) {
+    public String createToken(UserDetails userDetails, String id, long expiration) {
         this.checkUserJitNumber(userDetails);
 
         Date now = new Date();
@@ -77,11 +77,11 @@ public class JwtTokenProvider {
         claims.put(Constant.CLAIM_KEY_CREATED, now);
         claims.put(Constant.CHECK_KEY, Constant.CHECK_VALUE);
 
-        Date validity = new Date(now.getTime() + jwt.getExpiration() * 1000);
+        Date validity = new Date(now.getTime() + expiration * 1000);
         ValueOperations<String, Object> operation = redisTemplate.opsForValue();
 
         String key = getUserKey(username, id);
-        operation.set(key, userDetails, jwt.getExpiration(), TimeUnit.SECONDS);
+        operation.set(key, userDetails, expiration, TimeUnit.SECONDS);
 
 
         String compact = Jwts.builder()
@@ -93,6 +93,10 @@ public class JwtTokenProvider {
                 .compact();
         log.trace("user = {} gen token success! token size = {} id = {}", username, compact.length(), id);
         return compact;
+    }
+
+    public String createToken(UserDetails userDetails, String id) {
+        return createToken(userDetails, id, jwt.getExpiration());
     }
 
     public void clearUser (UserDetails userDetails, String id) {

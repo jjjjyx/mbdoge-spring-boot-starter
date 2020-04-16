@@ -1,6 +1,7 @@
 package cn.mbdoge.jyx.web.handler;
 
 import cn.mbdoge.jyx.exception.LocalServiceException;
+import cn.mbdoge.jyx.exception.RequestLimitException;
 import cn.mbdoge.jyx.web.model.RespResult;
 
 import lombok.extern.slf4j.Slf4j;
@@ -113,9 +114,9 @@ public class ControllerHandlerAdvice {
             Object value = fieldError.getRejectedValue();
             String msg = fieldError.getDefaultMessage();
             if (msg == null || "".equals(msg)) {
-                return RespResult.warning(this.messageSourceAccessor.getMessage("controller.parameter.MethodArgumentNotValid", new Object[]{field, value}));
+                return RespResult.warning(this.messageSourceAccessor.getMessage("controller.parameter.MethodArgumentNotValid", new Object[]{field, value}), fieldError.getField());
             } else {
-                return RespResult.warning(msg);
+                return RespResult.warning(msg, fieldError.getField());
             }
         } else {
             return RespResult.warning(this.messageSourceAccessor.getMessage("controller.parameter.MethodArgumentNotValid.empty"));
@@ -198,6 +199,21 @@ public class ControllerHandlerAdvice {
     @ExceptionHandler({LocalServiceException.class})
     public RespResult<?> handleServiceException(LocalServiceException e) {
         return RespResult.info(this.messageSourceAccessor.getMessage(e.getMessage(), e.getParams()), e.getData());
+    }
+
+    /**
+     * 访问限制
+     * @param e
+     * @return
+     */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler({RequestLimitException.class})
+    public RespResult<?> handleRequestLimitException(RequestLimitException e) {
+        String message = e.getMessage();
+        if (message == null) {
+            message = "request.limit";
+        }
+        return RespResult.warning(this.messageSourceAccessor.getMessage(message));
     }
 
 //    @ResponseStatus(HttpStatus.FORBIDDEN)
