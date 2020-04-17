@@ -24,6 +24,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
@@ -60,6 +61,9 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Autowired
     private ConfigureHttpSecurity configureHttpSecurity;
 
+    @Autowired
+    private ConfigureWebSecurity configureWebSecurity;
+
 
     @Autowired
     private AuthenticationEntryPoint authenticationEntryPoint;
@@ -86,7 +90,7 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         // 后续有需要在参数化出来
@@ -101,6 +105,13 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     public GrantedAuthorityDefaults grantedAuthorityDefaults() {
         // Remove the ROLE_ prefix
         return new GrantedAuthorityDefaults("");
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        if (configureWebSecurity!=null) {
+            configureWebSecurity.configure(web);
+        }
     }
 
     @Override

@@ -74,6 +74,12 @@ public class EnableSecurityConfigure {
         return (httpSecurity) -> { };
     }
 
+    @Bean
+    @ConditionalOnMissingBean(ConfigureWebSecurity.class)
+    public ConfigureWebSecurity configureWebSecurity  () throws Exception {
+        return (webSecurity) -> { };
+    }
+
     @Bean(name = "customDaoAuthenticationProvider")
     @ConditionalOnMissingBean(DaoAuthenticationProvider.class)
     public DaoAuthenticationProvider customDaoAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
