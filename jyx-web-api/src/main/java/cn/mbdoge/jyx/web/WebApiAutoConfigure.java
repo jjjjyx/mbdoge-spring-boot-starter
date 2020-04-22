@@ -5,6 +5,7 @@ import cn.mbdoge.jyx.web.handler.ControllerHandlerAdvice;
 import cn.mbdoge.jyx.web.language.LanguageConfigure;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,8 +16,11 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.Ordered;
+import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 import java.util.*;
@@ -31,20 +35,25 @@ import java.util.*;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE + 11)
 @Import({LanguageConfigure.class, ControllerHandlerAdvice.class})
-public class WebApiAutoConfigure {
-
-
+public class WebApiAutoConfigure implements WebMvcConfigurer {
+    @Autowired
+    private MessageSource messageSource;
     public WebApiAutoConfigure() {
 //        this.webApiProperties = webApiProperties;
     }
 
+
+    @Override
+    public Validator getValidator() {
+        return localValidator(messageSource);
+    }
     /**
      * 让验证时快熟失效
      * 当验证多个字段时，第一个错误字段出现，后续的不在验证
      *
      * @return
      */
-    @Bean
+//    @Bean
     public LocalValidatorFactoryBean localValidator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource);
