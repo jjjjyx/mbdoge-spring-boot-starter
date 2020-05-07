@@ -58,6 +58,10 @@ public class RespResult<T> {
     private T data;
     private Date timestamp;
 
+    public RespResult() {
+        this(SUCCESS);
+    }
+
     public RespResult(int level) {
         this(level, "");
     }
