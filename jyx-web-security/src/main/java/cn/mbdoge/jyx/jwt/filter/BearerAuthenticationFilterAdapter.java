@@ -45,16 +45,21 @@ public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFi
             return;
         }
 //        BasicAuthenticationFilter
+        UserDetails userDetails = null;
         try {
-            UserDetails userDetails = jwtTokenProvider.getUserDetails(token);
+            userDetails = jwtTokenProvider.getUserDetails(token);
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
 
-            this.logger.trace("Authentication success: " + auth);
+            log.trace("Authentication success: " + auth);
             // 这里没有验证服务端限制的过期， 因为user的设计 没有过期项，也没有禁用相关
             SecurityContextHolder.getContext().setAuthentication(auth);
         } catch (AuthenticationException e) {
+            if (userDetails != null) {
+                log.debug("user {} Authentication request for failed: {}",  userDetails.getUsername(), e.getMessage());
+            } else {
+                log.debug("Authentication request for failed: {}", e.getMessage());
+            }
             SecurityContextHolder.clearContext();
-            this.logger.debug("Authentication request for failed: " + e.getMessage());
             authenticationEntryPoint.commence(request, response, e);
             return;
             // 提交了token 却验证错误

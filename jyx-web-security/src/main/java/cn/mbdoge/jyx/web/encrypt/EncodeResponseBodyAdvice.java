@@ -22,6 +22,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * @author jyx
+ */
 @Slf4j
 @ConditionalOnWebApplication
 @ConditionalOnProperty(prefix = "mbdoge.web.security.api.encrypt",value = "enabled",havingValue = "true")
@@ -35,11 +38,13 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
         this.apiEncrypt = apiEncrypt;
     }
 
+    @Override
     public boolean supports(MethodParameter returnType, Class converterType) {
         return true;
     }
 
 
+    @Override
     public Object beforeBodyWrite(Object body, MethodParameter returnType, MediaType selectedContentType, Class selectedConverterType, ServerHttpRequest srequest, ServerHttpResponse response) {
         ServletServerHttpRequest temp = (ServletServerHttpRequest) srequest;
         HttpServletRequest req = temp.getServletRequest();

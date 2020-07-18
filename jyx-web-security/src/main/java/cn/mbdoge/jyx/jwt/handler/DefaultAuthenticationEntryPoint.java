@@ -38,11 +38,8 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
         response.setContentType("application/json; charset=utf-8");
 
         String ret = e.getMessage();
-//        if (e instanceof InsufficientAuthenticationException) {
-//            ret = messageSourceAccessor.getMessage("ExceptionTranslationFilter.insufficientAuthentication");
-//        }
 
-        log.debug("JwtAuthenticationEntryPoint : message = {}, Exception = {}", e.getMessage(), e.getClass());
+        log.trace("JwtAuthenticationEntryPoint : message = {}, Exception = {}", e.getMessage(), e.getClass());
         PrintWriter out = response.getWriter();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         // 是否需要加密

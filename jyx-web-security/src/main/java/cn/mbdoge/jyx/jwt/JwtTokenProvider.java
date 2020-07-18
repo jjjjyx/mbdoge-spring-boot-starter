@@ -42,18 +42,18 @@ public class JwtTokenProvider {
     }
 
     private void checkUserJitNumber (UserDetails userDetails) {
-        log.debug("checkUserJitNumber jwt.getJitMax() = {} ", jwt.getJitMax());
+        log.trace("checkUserJitNumber jwt.getJitMax() = {} ", jwt.getJitMax());
         Set<String> userOnlineList = this.getUserOnlineList(userDetails);
         if (jwt.getJitMax() == 0) {
             return;
         }
-        log.debug("checkUserJitNumber userOnline size = {} ", userOnlineList.size());
+        log.trace("checkUserJitNumber userOnline size = {} ", userOnlineList.size());
         int l = userOnlineList.size() - jwt.getJitMax();
         if (l >= 0) {
             Iterator<String> iterator = userOnlineList.iterator();
             for (int i = 0; i <= l; i++) {
                 String key = iterator.next();
-                log.debug("用户数量超出最大值，删除 {}", key);
+                log.trace("用户数量超出最大值，删除 {}", key);
                 redisTemplate.delete(key);
             }
         }
