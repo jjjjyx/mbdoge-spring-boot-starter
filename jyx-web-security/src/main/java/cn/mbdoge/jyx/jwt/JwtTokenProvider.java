@@ -148,9 +148,6 @@ public class JwtTokenProvider {
                 .setSigningKey(secret)
                 .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-
-//            System.out.println(e.getMessage());
-//            System.out.println("e.getClaims() = " + e.getClaims());
             throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "凭证已过期") , e);
         } catch (Exception e) {
             // 其他情况的解析失败

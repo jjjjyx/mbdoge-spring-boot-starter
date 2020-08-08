@@ -49,8 +49,8 @@ public class RelatedBeanConfigure {
 
     @Bean
     @ConditionalOnMissingBean(AuthenticationEntryPoint.class)
-    public AuthenticationEntryPoint authenticationEntryPoint (ApiEncrypt apiEncrypt) {
-        return new DefaultAuthenticationEntryPoint(apiEncryptProperties, objectMapper, apiEncrypt);
+    public AuthenticationEntryPoint authenticationEntryPoint (ApiEncrypt apiEncrypt, MessageSourceAccessor messageSourceAccessor) {
+        return new DefaultAuthenticationEntryPoint(apiEncryptProperties, objectMapper, apiEncrypt, messageSourceAccessor);
     }
 
     @Bean

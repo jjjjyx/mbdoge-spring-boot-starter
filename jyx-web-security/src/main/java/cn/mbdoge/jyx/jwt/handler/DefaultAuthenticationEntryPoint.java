@@ -20,17 +20,23 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * @author jyx
+ */
 @Slf4j
 public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper;
     private final ApiEncrypt apiEncrypt;
     private final ApiEncryptProperties apiEncryptProperties;
+    private final MessageSourceAccessor messageSourceAccessor;
 
-    public DefaultAuthenticationEntryPoint(ApiEncryptProperties apiEncryptProperties, ObjectMapper objectMapper, ApiEncrypt apiEncrypt) {
+    public DefaultAuthenticationEntryPoint(ApiEncryptProperties apiEncryptProperties, ObjectMapper objectMapper, ApiEncrypt apiEncrypt, MessageSourceAccessor messageSourceAccessor) {
         this.objectMapper = objectMapper;
         this.apiEncrypt = apiEncrypt;
         this.apiEncryptProperties = apiEncryptProperties;
+        this.messageSourceAccessor = messageSourceAccessor;
+
     }
 
     @Override
@@ -38,6 +44,14 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
         response.setContentType("application/json; charset=utf-8");
 
         String ret = e.getMessage();
+
+        /*
+            fix  InsufficientAuthenticationException 读取不到自定义的语言项
+         */
+        if (e instanceof InsufficientAuthenticationException) {
+            ret = messageSourceAccessor.getMessage("ExceptionTranslationFilter.insufficientAuthentication", ret);
+            log.trace("fix InsufficientAuthenticationException message = {}", ret);
+        }
 
         log.trace("JwtAuthenticationEntryPoint : message = {}, Exception = {}", e.getMessage(), e.getClass());
         PrintWriter out = response.getWriter();

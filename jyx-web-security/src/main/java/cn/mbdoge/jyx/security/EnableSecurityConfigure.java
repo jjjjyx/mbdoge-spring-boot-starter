@@ -57,9 +57,7 @@ public class EnableSecurityConfigure {
             throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
         };
     }
-    //    @Autowired
 
-//    private MessageSourceAccessor messageSourceAccessor;
     @Bean(name = "bearerAuthenticationFilterAdapter")
     @ConditionalOnMissingBean(BearerAuthenticationFilterAdapter.class)
     public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter (
