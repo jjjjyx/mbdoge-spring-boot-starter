@@ -109,11 +109,11 @@ public class ControllerHandlerAdvice {
     private RespResult<?> parseBindingResult (BindingResult result) {
         if (result.hasFieldErrors()) {
             FieldError fieldError = result.getFieldError();
-            // String field = fieldError.getField();
             // Object value = fieldError.getRejectedValue();
             // this.messageSourceAccessor.getMessage("controller.parameter.MethodArgumentNotValid", new Object[]{field, value}), fieldError.getField()
             assert fieldError != null;
-            return RespResult.warning(fieldError.getDefaultMessage());
+            String field = fieldError.getField();
+            return RespResult.warning(fieldError.getDefaultMessage(), field);
         } else {
             return RespResult.warning(this.messageSourceAccessor.getMessage("controller.parameter.MethodArgumentNotValid.empty"));
         }
