@@ -5,6 +5,7 @@ package cn.mbdoge.jyx.security;
 
 import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.jwt.handler.AccessExceptionAdvice;
+import cn.mbdoge.jyx.jwt.handler.DefaultAccessDeniedHandler;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.encrypt.EncodeResponseBodyAdvice;
 
@@ -64,6 +65,8 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Autowired
     private ConfigureWebSecurity configureWebSecurity;
 
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;
 
     @Autowired
     private AuthenticationEntryPoint authenticationEntryPoint;
@@ -75,18 +78,11 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     private DaoAuthenticationProvider customDaoAuthenticationProvider;
 
 
-//    @Autowired
-//    private CorsConfigurationSource corsConfigurationSource;
-
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-//        super.configure(auth);
         auth.authenticationProvider(customDaoAuthenticationProvider);
-
     }
 
-    //    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("*"));
@@ -137,7 +133,7 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
             configureHttpSecurity.configure(httpSecurity);
         }
         httpSecurity.exceptionHandling()
-//                .accessDeniedHandler(defaultAccessDeniedHandler)
+                .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint);
         httpSecurity.cors().configurationSource(corsConfigurationSource());
 
@@ -151,10 +147,6 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {
-        AuthenticationManager authenticationManager = super.authenticationManager();
-
-        return authenticationManager;
+        return super.authenticationManager();
     }
-
-
 }

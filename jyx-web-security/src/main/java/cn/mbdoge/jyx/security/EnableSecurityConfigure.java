@@ -3,28 +3,13 @@ package cn.mbdoge.jyx.security;
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.jwt.filter.DefaultBearerAuthenticationFilter;
-import cn.mbdoge.jyx.jwt.handler.DefaultAuthenticationEntryPoint;
-import cn.mbdoge.jyx.web.encrypt.DefaultApiAesEncrypt;
+
 import lombok.extern.slf4j.Slf4j;
-
-
-import cn.mbdoge.jyx.encrypt.AesEncrypt;
-import cn.mbdoge.jyx.web.encrypt.ApiEncrypt;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.MessageSourceAccessor;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

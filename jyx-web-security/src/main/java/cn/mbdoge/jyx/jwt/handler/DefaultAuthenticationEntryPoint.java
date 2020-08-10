@@ -53,7 +53,7 @@ public class DefaultAuthenticationEntryPoint implements AuthenticationEntryPoint
             log.trace("fix InsufficientAuthenticationException message = {}", ret);
         }
 
-        log.trace("JwtAuthenticationEntryPoint : message = {}, Exception = {}", e.getMessage(), e.getClass());
+        log.trace("DefaultAuthenticationEntryPoint : message = {}, Exception = {}", e.getMessage(), e.getClass());
         PrintWriter out = response.getWriter();
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         // 是否需要加密

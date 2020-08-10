@@ -1,6 +1,7 @@
 package cn.mbdoge.jyx.security;
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
+import cn.mbdoge.jyx.jwt.handler.DefaultAccessDeniedHandler;
 import cn.mbdoge.jyx.jwt.handler.DefaultAuthenticationEntryPoint;
 import cn.mbdoge.jyx.web.encrypt.ApiEncrypt;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 
 @Configurable
 public class RelatedBeanConfigure {
@@ -51,6 +53,12 @@ public class RelatedBeanConfigure {
     @ConditionalOnMissingBean(AuthenticationEntryPoint.class)
     public AuthenticationEntryPoint authenticationEntryPoint (ApiEncrypt apiEncrypt, MessageSourceAccessor messageSourceAccessor) {
         return new DefaultAuthenticationEntryPoint(apiEncryptProperties, objectMapper, apiEncrypt, messageSourceAccessor);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(AccessDeniedHandler.class)
+    public AccessDeniedHandler accessDeniedHandler (ApiEncrypt apiEncrypt, MessageSourceAccessor messageSourceAccessor) {
+        return new DefaultAccessDeniedHandler(apiEncryptProperties, objectMapper, apiEncrypt, messageSourceAccessor);
     }
 
     @Bean
