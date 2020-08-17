@@ -2,24 +2,26 @@ package cn.mbdoge.jyx.web.model;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * @author jyx
  */
 @Data
-public class IpGeoVO {
+public class IpGeoVO implements Serializable {
     private static final String CN = "CN";
-    String status;
-    String message;
-    String query;
-    String country;
-    String countryCode;
-    String region;
-    String regionName;
-    String city;
-    Float lat;
-    Float lon;
-    String timezone;
-    Integer offset;
+    private String status;
+    private String message;
+    private String query;
+    private String country;
+    private String countryCode;
+    private String region;
+    private String regionName;
+    private String city;
+    private Float lat;
+    private Float lon;
+    private String timezone;
+    private Integer offset;
 
     @Override
     public String toString () {
