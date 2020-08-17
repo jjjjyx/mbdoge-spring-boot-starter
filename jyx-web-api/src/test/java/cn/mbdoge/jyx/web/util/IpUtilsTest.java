@@ -35,7 +35,6 @@ class IpUtilsTest {
 
         assertTrue(IpUtils.internalIp(InetAddress.getByName("10.167.55.12")));
         assertFalse(IpUtils.internalIp(InetAddress.getByName("11.167.55.12")));
-
     }
 
     @Test

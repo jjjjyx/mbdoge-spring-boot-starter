@@ -159,7 +159,7 @@ public final class IpUtils {
      * @return 地理位置列表
      * @throws AnalyzeIpGeoException api 请求失败
      */
-    public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress) throws AnalyzeIpGeoException {
+    public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress, String lang) throws AnalyzeIpGeoException {
         Objects.requireNonNull(ipAddress);
 
         List<String> ips = Stream.of(ipAddress).filter(i -> !internalIp(i)).map(InetAddress::getHostAddress).collect(Collectors.toList());
@@ -168,7 +168,7 @@ public final class IpUtils {
         }
         byte[] body = ("[\"" + String.join("\",\"", ips) + "\"]").getBytes(StandardCharsets.UTF_8);
         try {
-            URL realUrl = new URL(GEO_BATCH_URL);
+            URL realUrl = new URL(GEO_BATCH_URL + "?lang=" + lang);
             URLConnection connection = realUrl.openConnection();
             HttpURLConnection http = (HttpURLConnection) connection;
             http.setRequestMethod("POST");
@@ -191,6 +191,16 @@ public final class IpUtils {
             log.trace("查询 ip = {} 地址信息失败请求api失败", Arrays.toString(ipAddress));
             throw new AnalyzeIpGeoException(e);
         }
+    }
+
+    /**
+     * 批量查询ip地址 自动过滤所有内网地址
+     * @param ipAddress ip 列表
+     * @return 地理位置列表
+     * @throws AnalyzeIpGeoException api 请求失败
+     */
+    public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress) throws AnalyzeIpGeoException {
+        return queryIpGeoByApi(ipAddress, "zh-CN");
     }
 
 
