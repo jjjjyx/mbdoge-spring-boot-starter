@@ -1,5 +1,8 @@
 package cn.mbdoge.jyx.jwt;
 
+/**
+ * @author jyx
+ */
 public class Constant {
     public static final String AUTHENTICATION_SCHEME_BEARER = "bearer ";
     public static final String AUTHENTICATION_SCHEME_BASIC = "basic ";

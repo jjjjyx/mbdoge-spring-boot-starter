@@ -1,25 +1,11 @@
 plugins {
     id 'java'
     id "java-library"
-    id 'org.springframework.boot' version "2.2.5.RELEASE" apply false
-    id 'io.spring.dependency-management' version "1.0.9.RELEASE"
-
+    id 'org.springframework.boot'
+    id 'io.spring.dependency-management'
 }
 
 sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
-
-dependencyManagement {
-    imports {
-        mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    }
-}
-//configurations {
-//    all*.exclude module : 'spring-boot-starter-logging'
-//}
 
 dependencies {
     api project(':jyx-common')

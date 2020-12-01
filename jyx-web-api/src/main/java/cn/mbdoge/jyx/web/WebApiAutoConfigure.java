@@ -51,9 +51,8 @@ public class WebApiAutoConfigure implements WebMvcConfigurer {
      * 让验证时快熟失效
      * 当验证多个字段时，第一个错误字段出现，后续的不在验证
      *
-     * @return
+     * @return LocalValidatorFactoryBean
      */
-//    @Bean
     public LocalValidatorFactoryBean localValidator(MessageSource messageSource) {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource);
@@ -73,8 +72,8 @@ public class WebApiAutoConfigure implements WebMvcConfigurer {
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> containerCustomizer() {
         return factory -> {
             factory.addConnectorCustomizers(connector -> {
-                connector.setAttribute("relaxedPathChars", "<>[\\]^`{|}");
-                connector.setAttribute("relaxedQueryChars", "<>[\\]^`{|}");
+                connector.setProperty("relaxedPathChars", "<>[\\]^`{|}");
+                connector.setProperty("relaxedQueryChars", "<>[\\]^`{|}");
             });
         };
     }

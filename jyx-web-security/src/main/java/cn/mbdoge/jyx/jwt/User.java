@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -21,14 +22,14 @@ import java.util.stream.Collectors;
 public class User implements UserDetails, Serializable {
 
     private static final long serialVersionUID = 982649350878695388L;
-    @JsonView(DataView.AdminView.class)
+
     private Long id;
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     private Integer userStatus;
-    private Date nextExpireTime;
+    private LocalDateTime nextExpireTime;
 
     @JsonIgnore
     private List<GrantedAuthority> authorities;
@@ -44,7 +45,7 @@ public class User implements UserDetails, Serializable {
     /**
      * 登陆时间
      */
-    private Date loginTime;
+    private LocalDateTime loginTime;
     /**
      * 登录IP地址
      */
@@ -94,14 +95,14 @@ public class User implements UserDetails, Serializable {
             return false;
         }
 
-        Date currentDate = new Date();
-        Date expireDate = this.nextExpireTime;
+        LocalDateTime currentDate = LocalDateTime.now();
+        LocalDateTime expireDate = this.nextExpireTime;
         // 无限时间
         if (expireDate == null) {
             return true;
         }
 
-        return currentDate.before(expireDate);
+        return currentDate.isBefore(expireDate);
     }
 
     @Override

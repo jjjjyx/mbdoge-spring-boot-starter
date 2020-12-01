@@ -5,10 +5,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * @author jyx
+ */
 public final class Dispatch {
 
-    private Map<String, List<EventCallback>> eventCallbacks = new HashMap<>();
-    private ExecutorService executorService = Executors.newCachedThreadPool();
+    private final Map<String, List<EventCallback>> eventCallbacks = new HashMap<>();
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public Dispatch() {
     }
@@ -34,8 +37,9 @@ public final class Dispatch {
 
     protected void unListen(String type, EventCallback callBack) {
         List<EventCallback> eventCallbackList = this.eventCallbacks.get(type);
-        if (eventCallbackList != null)
+        if (eventCallbackList != null) {
             eventCallbackList.remove(callBack);
+        }
 //        log.info("移除监听 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
@@ -86,7 +90,7 @@ public final class Dispatch {
     }
 
 
-//    public Future<Boolean> fire(final T event, Map<String, Object> data) {
+
     public Future<Boolean> fire(final AbstractEvent event) {
         Objects.requireNonNull(event);
 //        log.trace("触发事件 = eventName = {}, args.size = {}", event.name(), data.size());

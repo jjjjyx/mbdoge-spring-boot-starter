@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.OutputStream;
@@ -32,6 +33,20 @@ public final class IpUtils {
     }
 
     private IpUtils() {}
+
+    public static String shieldIp(String ip) {
+        if (StringUtils.hasText(ip)) {
+            return "";
+        }
+        String[] arr = ip.split("\\.");
+        //noinspection AlibabaUndefineMagicConstant
+        if (arr.length != 4) {
+            return ip;
+        }
+        arr[1] = arr[2] = "*";
+        return String.join(".", arr);
+    }
+
     /**
      * 获取请求中的真实 ip 地址
      * @param request req
@@ -78,9 +93,13 @@ public final class IpUtils {
      */
     private static final byte SECTION_5 = (byte) 0xC0;
     private static final byte SECTION_6 = (byte) 0xA8;
-    // 127.0.0.1
+    /**
+     * 127.0.0.1
+     */
     private static final int LOCAL_1 = 2130706433;
-    // 0:0:0:0:0:0:0:1
+    /**
+     * 0:0:0:0:0:0:0:1
+     */
     private static final int LOCAL_2 = 1;
 
     /**

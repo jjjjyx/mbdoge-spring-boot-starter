@@ -7,6 +7,7 @@ package cn.mbdoge.jyx.event;
  *     event {}
  * }
  * </pre>
+ * @author jyx
  */
 public interface EventType {
 

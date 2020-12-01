@@ -1,8 +1,8 @@
 package cn.mbdoge.jyx.security;
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
-import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
-import cn.mbdoge.jyx.jwt.filter.DefaultBearerAuthenticationFilter;
+import cn.mbdoge.jyx.jwt.filter.AbstractBearerAuthenticationFilterAdapter;
+import cn.mbdoge.jyx.jwt.filter.DefaultAbstractBearerAuthenticationFilter;
 
 import lombok.extern.slf4j.Slf4j;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
@@ -17,9 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import java.security.GeneralSecurityException;
-import java.util.Objects;
-
+/**
+ * @author jyx
+ */
 @Slf4j
 @Import({RelatedBeanConfigure.class})
 public class EnableSecurityConfigure {
@@ -44,11 +44,11 @@ public class EnableSecurityConfigure {
     }
 
     @Bean(name = "bearerAuthenticationFilterAdapter")
-    @ConditionalOnMissingBean(BearerAuthenticationFilterAdapter.class)
-    public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter (
+    @ConditionalOnMissingBean(AbstractBearerAuthenticationFilterAdapter.class)
+    public AbstractBearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter (
             JwtTokenProvider jwtTokenProvider,
             AuthenticationEntryPoint authenticationEntryPoint) {
-        return new DefaultBearerAuthenticationFilter(jwtTokenProvider, authenticationEntryPoint);
+        return new DefaultAbstractBearerAuthenticationFilter(jwtTokenProvider, authenticationEntryPoint);
     }
 
     @Bean

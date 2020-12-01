@@ -1,7 +1,16 @@
 # mbdoge-spring-boot-starter
 适用于 spring boot 2.x 版本的starter ，用于快速创建web项目，内置了大量常用web配置，以及api加密功能
 
+# 2.4.0.82 版本
+修复版本的增加方式，改为跟随spring boot 使用的版本
+例如在项目使用 2.4.0.82 那么对应的 spring boot 版本建议使用 2.4.0
 
+* 修复
+    - 语法格式，语法检查修改
+    - 兼容2.4.0 版本，支持cors 的设置 2.4.0 不允许设置 allow-origins = * 现在改为在配置文件中指定allow
+
+# 0.0.8 版本
+..
 
 # 0.0.2 版本
 

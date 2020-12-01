@@ -3,9 +3,8 @@ package cn.mbdoge.jyx.security;
 
 
 
-import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
+import cn.mbdoge.jyx.jwt.filter.AbstractBearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.jwt.handler.AccessExceptionAdvice;
-import cn.mbdoge.jyx.jwt.handler.DefaultAccessDeniedHandler;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.encrypt.EncodeResponseBodyAdvice;
 
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -29,8 +27,6 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -46,6 +42,7 @@ import java.util.Collections;
  * 比如，保存 token
  * 验证用户
  * redis
+ * @author jyx
  */
 @Slf4j
 @Configuration
@@ -72,7 +69,7 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     private AuthenticationEntryPoint authenticationEntryPoint;
 
     @Autowired
-    private BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter;
+    private AbstractBearerAuthenticationFilterAdapter abstractBearerAuthenticationFilterAdapter;
 
     @Autowired @Qualifier("customDaoAuthenticationProvider")
     private DaoAuthenticationProvider customDaoAuthenticationProvider;
@@ -85,12 +82,15 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
-        configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.setAllowCredentials(true);
-        // 后续有需要在参数化出来
-        configuration.setExposedHeaders(Arrays.asList("Accept-Language", "Authorization", "Content-Disposition", "Content-Length"));
+
+        // 使用 addAllow 防止覆盖掉用户的自定义设置
+        // fix: 2.4.0 不能使用 Credentials = true 设置  AllowOrigin = * 的问题
+        webSecurityProperties.getCorsAllowOrigin().forEach(configuration::addAllowedOrigin);
+        webSecurityProperties.getCorsAllowMethod().forEach(configuration::addAllowedMethod);
+        webSecurityProperties.getCorsAllowHeader().forEach(configuration::addAllowedHeader);
+        webSecurityProperties.getCorsExposedHeaders().forEach(configuration::addExposedHeader);
+
+        configuration.setAllowCredentials(webSecurityProperties.isCorsCredentials());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration(webSecurityProperties.getCorsUrl(), configuration);
@@ -138,8 +138,8 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
         httpSecurity.cors().configurationSource(corsConfigurationSource());
 
         httpSecurity.csrf().disable();
-        if (bearerAuthenticationFilterAdapter !=null) {
-            httpSecurity.addFilterBefore(bearerAuthenticationFilterAdapter, UsernamePasswordAuthenticationFilter.class);
+        if (abstractBearerAuthenticationFilterAdapter !=null) {
+            httpSecurity.addFilterBefore(abstractBearerAuthenticationFilterAdapter, UsernamePasswordAuthenticationFilter.class);
         }
 
         httpSecurity.headers().cacheControl();

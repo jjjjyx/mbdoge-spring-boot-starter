@@ -4,10 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * @author jyx
+ */
 @Getter
 @Setter
 @ConfigurationProperties("mbdoge.web.security")
@@ -18,6 +19,11 @@ public class WebSecurityProperties {
      */
     private String secret = "secret1";
     private String corsUrl = "/api/**";
+    private List<String> corsAllowOrigin = new ArrayList<>();
+    private List<String> corsAllowMethod = Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH");
+    private List<String> corsAllowHeader = Collections.singletonList("*");
+    private List<String> corsExposedHeaders = Arrays.asList("Accept-Language", "Authorization", "Content-Disposition", "Content-Length");
+    private boolean corsCredentials = false;
     private String apiPrefix = "/api";
 
     private Jwt jwt = new Jwt();

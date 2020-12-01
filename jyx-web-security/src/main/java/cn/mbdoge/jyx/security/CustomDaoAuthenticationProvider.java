@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 import java.util.Locale;
 
 
+/**
+ * @author jyx
+ */
 public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
     public CustomDaoAuthenticationProvider(MessageSource messageSource,

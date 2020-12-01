@@ -19,6 +19,9 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
+/**
+ * @author jyx
+ */
 @Configurable
 public class RelatedBeanConfigure {
     @Autowired

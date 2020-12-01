@@ -1,19 +1,16 @@
 plugins {
     id 'java'
-//    id "io.spring.dependency-management" version "1.0.9.RELEASE"
+    id 'org.springframework.boot' version "$springVersion" apply false
+    id 'io.spring.dependency-management' version "1.0.10.RELEASE" apply false
 }
+
+//apply from: 'properties.gradle'
 
 sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
 
 }
-
-
 
 configurations {
     // 支持通过group、module排除，可以同时使用
@@ -27,20 +24,21 @@ configurations {
 }
 
 def localRepositoryPath = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
-
-subprojects {
+allprojects  {
     group = 'cn.mbdoge.jyx'
-    version = '0.0.81'
-
-    apply plugin: 'maven'
-//    apply plugin: 'io.spring.dependency-management'
-//    apply plugin: 'java-library'
 
     repositories {
         mavenCentral()
     }
+}
 
+subprojects {
 
+    apply plugin: 'maven'
+
+//    apply plugin: 'io.spring.dependency-management'
+//    apply plugin: 'java-library'
+//    version = "$springBootVersion-82"
     test {
         useJUnitPlatform()
     }

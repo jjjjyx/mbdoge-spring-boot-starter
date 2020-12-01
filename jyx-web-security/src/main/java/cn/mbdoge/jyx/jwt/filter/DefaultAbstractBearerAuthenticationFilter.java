@@ -2,15 +2,17 @@ package cn.mbdoge.jyx.jwt.filter;
 
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
-import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import javax.servlet.http.HttpServletRequest;
 
 
-public class DefaultBearerAuthenticationFilter extends BearerAuthenticationFilterAdapter {
+/**
+ * @author jyx
+ */
+public class DefaultAbstractBearerAuthenticationFilter extends AbstractBearerAuthenticationFilterAdapter {
 
-    public DefaultBearerAuthenticationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
+    public DefaultAbstractBearerAuthenticationFilter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
         super(jwtTokenProvider, authenticationEntryPoint);
     }
 

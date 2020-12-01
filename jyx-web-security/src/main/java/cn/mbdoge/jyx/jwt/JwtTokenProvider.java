@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 
+/**
+ * @author jyx
+ */
 @Slf4j
 public class JwtTokenProvider {
     private final WebSecurityProperties.Jwt jwt;

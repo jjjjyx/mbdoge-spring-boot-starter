@@ -18,13 +18,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * @author jyx
+ */
 @Slf4j
-public abstract class BearerAuthenticationFilterAdapter extends OncePerRequestFilter {
+public abstract class AbstractBearerAuthenticationFilterAdapter extends OncePerRequestFilter {
 
     protected final JwtTokenProvider jwtTokenProvider;
     protected final AuthenticationEntryPoint authenticationEntryPoint;
 
-    public BearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
+    public AbstractBearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }

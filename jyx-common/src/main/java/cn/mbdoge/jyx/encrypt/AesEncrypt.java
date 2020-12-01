@@ -1,7 +1,6 @@
 package cn.mbdoge.jyx.encrypt;
 
 import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -14,8 +13,8 @@ import java.util.Objects;
  * @author jyx
  */
 public final class AesEncrypt {
-    private static final Base64.Decoder decoder = Base64.getDecoder();
-    private static final Base64.Encoder encoder = Base64.getEncoder();
+    private static final Base64.Decoder DECODER = Base64.getDecoder();
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
 
     public static String encrypt(String plainText, String key) throws GeneralSecurityException {
         Objects.requireNonNull(plainText);
@@ -39,7 +38,7 @@ public final class AesEncrypt {
         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
         byte[] encrypted = cipher.doFinal(clean);
 
-        return encoder.encodeToString(encrypted);
+        return ENCODER.encodeToString(encrypted);
     }
 
 
@@ -50,7 +49,7 @@ public final class AesEncrypt {
         int ivSize = 16;
         int keySize = 16;
 
-        byte[] encryptedIvTextBytes = decoder.decode(content);
+        byte[] encryptedIvTextBytes = DECODER.decode(content);
 
         // Extract IV.
         byte[] iv = new byte[ivSize];

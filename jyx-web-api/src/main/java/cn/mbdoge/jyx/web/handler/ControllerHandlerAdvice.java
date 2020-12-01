@@ -36,6 +36,7 @@ import java.util.Set;
 /**
  *  spring.mvc.throw-exception-if-no-handler-found=true
  * 需要配置这个选项
+ * @author jyx
  */
 @Slf4j
 @ConditionalOnClass(MessageSourceAccessor.class)
@@ -109,8 +110,6 @@ public class ControllerHandlerAdvice {
     private RespResult<?> parseBindingResult (BindingResult result) {
         if (result.hasFieldErrors()) {
             FieldError fieldError = result.getFieldError();
-            // Object value = fieldError.getRejectedValue();
-            // this.messageSourceAccessor.getMessage("controller.parameter.MethodArgumentNotValid", new Object[]{field, value}), fieldError.getField()
             assert fieldError != null;
             String field = fieldError.getField();
             return RespResult.warning(fieldError.getDefaultMessage(), field);

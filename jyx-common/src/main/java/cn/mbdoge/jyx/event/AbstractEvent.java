@@ -8,6 +8,9 @@ import java.util.EventObject;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author jyx
+ */
 public abstract class AbstractEvent extends EventObject {
     @Getter
     private final String type;

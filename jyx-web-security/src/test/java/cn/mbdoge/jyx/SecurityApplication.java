@@ -2,7 +2,7 @@ package cn.mbdoge.jyx;
 
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.User;
-import cn.mbdoge.jyx.jwt.filter.BearerAuthenticationFilterAdapter;
+import cn.mbdoge.jyx.jwt.filter.AbstractBearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.security.ConfigureHttpSecurity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -18,12 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @SpringBootApplication()
 public class SecurityApplication implements CommandLineRunner {
@@ -87,8 +84,8 @@ public class SecurityApplication implements CommandLineRunner {
         }
 
         @Bean
-        public BearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
-            return new BearerAuthenticationFilterAdapter(jwtTokenProvider, authenticationEntryPoint) {
+        public AbstractBearerAuthenticationFilterAdapter bearerAuthenticationFilterAdapter(JwtTokenProvider jwtTokenProvider, AuthenticationEntryPoint authenticationEntryPoint) {
+            return new AbstractBearerAuthenticationFilterAdapter(jwtTokenProvider, authenticationEntryPoint) {
             };
         }
     }
