@@ -23,7 +23,7 @@ configurations {
     all*.exclude group: 'org.slf4j', module: 'slf4j-log4j12' // slf4j -> log4j
 }
 
-def localRepositoryPath = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+
 allprojects  {
     group = 'cn.mbdoge.jyx'
 
@@ -34,26 +34,26 @@ allprojects  {
 
 subprojects {
 
-    apply plugin: 'maven'
-
+    apply from: "${rootDir}/mvn-push.gradle"
 //    apply plugin: 'io.spring.dependency-management'
-//    apply plugin: 'java-library'
 //    version = "$springBootVersion-82"
     test {
         useJUnitPlatform()
     }
 
-    uploadArchives {
-        repositories {
-            //mavenDeployer 需要依赖 apply plugin: 'maven'
-            mavenDeployer   {
-                repository(url: localRepositoryPath)
-                pom.project {
-                    name = project.name
-                    version = project.version
-                    groupId = project.group
-                }
-            }
-        }
-    }
+
+
+//    uploadArchives {
+//        repositories {
+//            //mavenDeployer 需要依赖 apply plugin: 'maven'
+//            mavenDeployer   {
+//                repository(url: localRepositoryPath)
+//                pom.project {
+//                    name = project.name
+//                    version = project.version
+//                    groupId = project.group
+//                }
+//            }
+//        }
+//    }
 }

@@ -1,0 +1,32 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+// >> nexus 配置
+def props = new Properties()
+
+file("${rootDir}/nexus.properties").withInputStream { props.load(it) }
+
+//def repositoryPath = props.hasProperty("nexusUrl") ?  : 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+//boolean hasAuth = !props.hasProperty("nexusAuth")
+//def username = props.hasProperty("nexusUsername") ? props.nexusUsername : ""
+//def password = props.hasProperty("nexusPassword") ? props.nexusPassword : ""
+
+uploadArchives {
+//    println("repositoryPath: $repositoryPath")
+    repositories {
+        //mavenDeployer 需要依赖 apply plugin: 'maven'
+        mavenDeployer  {
+
+            repository(url: props.nexusUrl) {
+                if (props.nexusAuth) {
+                    authentication(userName: props.nexusUsername, password: props.nexusPassword)
+                }
+            }
+            pom.project {
+                name = project.name
+                version = project.version
+                groupId = project.group
+            }
+        }
+    }
+}

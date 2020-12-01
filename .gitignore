@@ -141,3 +141,5 @@ src/**/application-*.properties
 
 logs/
 *.iml
+
+nexus.properties

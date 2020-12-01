@@ -427,7 +427,9 @@ public class ControllerHandlerAdviceTest {
                 .andExpect(status().is(200))
                 .andExpect(MockMvcResultMatchers.content().string("success"));
 
-        byte[] bytes = new byte[1048576 * 2000];
+        // fix: oom
+        // 300 M 有点太多了
+        byte[] bytes = new byte[1048576];
 
         // 300MB
         Arrays.fill(bytes, (byte) 1);
