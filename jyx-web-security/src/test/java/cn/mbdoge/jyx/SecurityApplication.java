@@ -18,9 +18,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootApplication()
 public class SecurityApplication implements CommandLineRunner {
@@ -59,8 +62,8 @@ public class SecurityApplication implements CommandLineRunner {
                 vo.setPassword(passwordEncoder.encode(username));
                 vo.setUserStatus(0);
                 // 30 s 后过期
-                Date date = new Date(System.currentTimeMillis() + 1000 * 30);
-                vo.setNextExpireTime(date);
+
+                vo.setNextExpireTime(LocalDateTime.now().plus(30, ChronoUnit.SECONDS));
                 List<GrantedAuthority> test = Arrays.asList(
                         new SimpleGrantedAuthority("TEST"),
                         new SimpleGrantedAuthority("XX")
