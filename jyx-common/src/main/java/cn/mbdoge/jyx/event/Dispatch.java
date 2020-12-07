@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
  */
 public final class Dispatch {
 
-    private final Map<String, List<EventCallback>> eventCallbacks = new HashMap<>();
+    private final Map<String, List<EventCallback<? extends AbstractEvent>>> eventCallbacks = new HashMap<>();
     private final ExecutorService executorService = Executors.newCachedThreadPool();
 
     public Dispatch() {
@@ -27,38 +27,38 @@ public final class Dispatch {
     }
 
 
-    protected void listen(String type, EventCallback callBack) {
-        List<EventCallback> eventCallbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
+    protected void listen(String type, EventCallback<? extends AbstractEvent> callBack) {
+        List<EventCallback<? extends AbstractEvent>> eventCallbackList = this.eventCallbacks.computeIfAbsent(type, k -> new ArrayList<>());
         if (!eventCallbackList.contains(callBack)) {
             eventCallbackList.add(callBack);
         }
 //        log.info("监听事件 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
-    protected void unListen(String type, EventCallback callBack) {
-        List<EventCallback> eventCallbackList = this.eventCallbacks.get(type);
+    protected void unListen(String type, EventCallback<? extends AbstractEvent> callBack) {
+        List<EventCallback<? extends AbstractEvent>> eventCallbackList = this.eventCallbacks.get(type);
         if (eventCallbackList != null) {
             eventCallbackList.remove(callBack);
         }
 //        log.info("移除监听 = eventName = {}, 已注册列表大小= {}, callback = {}", type.name(), callbackList.size() ,callBack.toString());
     }
 
-    public void bind(EventType eventType, EventCallback callBack) {
+    public void bind(EventType eventType, EventCallback<? extends AbstractEvent> callBack) {
         this.listen(eventType.name(), callBack);
     }
 
-    public void on(String eventNames, EventCallback callBack){
+    public void on(String eventNames, EventCallback<? extends AbstractEvent> callBack){
         String[] names = parseName(eventNames);
         for (String name : names) {
             this.listen(name, callBack);
         }
     }
 
-    public void unbind(EventType eventType, EventCallback callBack) {
+    public void unbind(EventType eventType, EventCallback<? extends AbstractEvent> callBack) {
         this.unListen(eventType.name(), callBack);
     }
 
-    public void off(String eventNames, EventCallback callBack){
+    public void off(String eventNames, EventCallback<? extends AbstractEvent> callBack){
         String[] names = parseName(eventNames);
         for (String name : names) {
             this.unListen(name, callBack);
@@ -67,18 +67,16 @@ public final class Dispatch {
 
     }
 
-    public void once(final EventType eventNames, final EventCallback eventCallback) {
+    public void once(final EventType eventNames, final EventCallback<? extends AbstractEvent> eventCallback) {
         this.once(eventNames.name(), eventCallback);
     }
 
-    public void once(final String eventNames, final EventCallback eventCallback) {
-        EventCallback temp = new EventCallback() {
+    public void once(final String eventNames, final EventCallback<? extends AbstractEvent> eventCallback) {
+        EventCallback<? extends AbstractEvent> temp = new EventCallback<AbstractEvent >() {
             @Override
             public void call(AbstractEvent event) throws Exception {
                 try {
-                    eventCallback.call(event);
-                } catch (Exception e) {
-                    throw e;
+                    eventCallback.mCall(event);
                 } finally {
                     off(eventNames, this);
                 }
@@ -97,15 +95,15 @@ public final class Dispatch {
         return executorService.submit(() -> {
             String key = event.getType();
             // 拷贝一份 防止在once 修改事件列表
-            List<EventCallback> eventCallbackList = new ArrayList<>(this.eventCallbacks.get(key));
+            List<EventCallback<? extends AbstractEvent>> eventCallbackList = new ArrayList<>(this.eventCallbacks.get(key));
             if (eventCallbackList.size() == 0) {
 //                log.trace("事件 {} 尚未注册，或者没有绑定事件 callbackList = {}", event.name(), callbackList);
                 return false;
             }
 //            log.trace("事件 {} 响应列表 size = {}", event.name(), callbackList.size());
-            for (EventCallback eventCallback : eventCallbackList) {
+            for (EventCallback<? extends AbstractEvent> eventCallback : eventCallbackList) {
                 try {
-                    eventCallback.call(event);
+                    eventCallback.mCall(event);
                 } catch (Exception ignored) {
                 }
                 if (event.shouldStopPropagationImmediately()) {
@@ -143,7 +141,7 @@ public final class Dispatch {
     }
 
     public int eventSize (String property) {
-        List<EventCallback> eventCallbackList = this.eventCallbacks.get(property);
+        List<EventCallback<? extends AbstractEvent>> eventCallbackList = this.eventCallbacks.get(property);
         return eventCallbackList == null ? 0 : eventCallbackList.size();
     }
 

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,7 +31,7 @@ class DispatchTest {
         assertEquals(0, dispatch.eventSize(D.init));
 
 
-        EventCallback eventCallback = (e) -> { };
+        EventCallback<AbstractEvent> eventCallback = (e) -> { };
         dispatch.bind(D.event, eventCallback);
         assertEquals(1, dispatch.eventSize(D.event.name()));
 
@@ -52,7 +51,7 @@ class DispatchTest {
     @DisplayName("测试事件重复绑定")
     void name0() {
         dispatch.addEventName(D.event);
-        EventCallback eventCallback = (e) -> { };
+        EventCallback<AbstractEvent> eventCallback = (e) -> { };
 
         dispatch.bind(D.event, eventCallback);
         assertEquals(1, dispatch.eventSize(D.event.name()));
@@ -65,18 +64,18 @@ class DispatchTest {
     @DisplayName("测试once重复绑定")
     void name01() throws ExecutionException, InterruptedException {
         dispatch.addEventName(D.event);
-        EventCallback eventCallback1 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback1 = (e) -> {
             System.out.println("1 = " + 1);
         };
-        EventCallback eventCallback2 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback2 = (e) -> {
             System.out.println("1 = " + 2);
         };
 
-        EventCallback eventCallback3 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback3 = (e) -> {
             System.out.println("1 = " + 3);
         };
 
-        EventCallback eventCallback4 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback4 = (e) -> {
             System.out.println("1 = " + 4);
         };
 
@@ -99,23 +98,23 @@ class DispatchTest {
 
         dispatch.addEventName(D.event);
         AtomicInteger i = new AtomicInteger();
-        EventCallback eventCallback1 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback1 = (e) -> {
             System.out.println("1 = " + 1);
             i.getAndIncrement();
             throw new Exception("xxx");
         };
-        EventCallback eventCallback2 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback2 = (e) -> {
             System.out.println("1 = " + 2);
             i.getAndIncrement();
             throw new Exception("xxx");
         };
 
-        EventCallback eventCallback3 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback3 = (e) -> {
             System.out.println("1 = " + 3);
             i.getAndIncrement();
         };
 
-        EventCallback eventCallback4 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback4 = (e) -> {
             System.out.println("1 = " + 4);
             i.getAndIncrement();
         };
@@ -148,11 +147,11 @@ class DispatchTest {
         assertEquals(1, dispatch.eventSize());
 
         AtomicInteger i = new AtomicInteger();
-        EventCallback eventCallback = (e) -> {
+        EventCallback<AbstractEvent> eventCallback = (e) -> {
             e.stopPropagation();
             i.getAndIncrement();
         };
-        EventCallback eventCallback2 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback2 = (e) -> {
             i.getAndIncrement();
         };
         dispatch.bind(D.event, eventCallback);
@@ -176,10 +175,10 @@ class DispatchTest {
         assertEquals(1, dispatch.eventSize());
 
         AtomicInteger i = new AtomicInteger();
-        EventCallback eventCallback = (e) -> {
+        EventCallback<AbstractEvent> eventCallback = (e) -> {
             i.getAndIncrement();
         };
-        EventCallback eventCallback2 = (e) -> {
+        EventCallback<AbstractEvent> eventCallback2 = (e) -> {
             i.getAndIncrement();
         };
         dispatch.bind(D.event, eventCallback);
@@ -202,7 +201,7 @@ class DispatchTest {
         assertEquals(1, dispatch.eventSize());
 
         AtomicInteger i = new AtomicInteger();
-        EventCallback eventCallback = (e) -> {
+        EventCallback<AbstractEvent> eventCallback = (e) -> {
             i.getAndIncrement();
         };
 
@@ -221,7 +220,7 @@ class DispatchTest {
         dispatch.addEventName(D.event);
         assertEquals(1, dispatch.eventSize());
 
-        EventCallback eventCallback = (e) -> {
+        EventCallback<AbstractEvent> eventCallback = (e) -> {
             Object params = e.getSource();
             assertTrue(params instanceof String);
             assertEquals(params, "abc");
@@ -238,6 +237,7 @@ class DispatchTest {
         dispatch.addEventName(D.init);
         assertEquals(2, dispatch.eventSize());
         eventCallback = (e) -> {
+            assertTrue(e instanceof Event);
             Object params = e.getSource();
             assertTrue(params instanceof String);
             assertEquals(params, "abc");
@@ -250,6 +250,18 @@ class DispatchTest {
         abc = dispatch.fire(event);
         aBoolean = abc.get();
         assertFalse(aBoolean);
+
+        dispatch.unbind(D.init, eventCallback);
+
+        EventCallback<Event> eventEventCallback2 = this::testCallback;
+        dispatch.bind(D.init, eventEventCallback2);
+    }
+
+    public void testCallback(Event e) {
+        Object params = e.getSource();
+        assertTrue(params instanceof String);
+        assertEquals(params, "abc");
+        assertEquals(D.init.name(), e.getType());
     }
 
 
