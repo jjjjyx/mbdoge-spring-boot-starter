@@ -24,7 +24,7 @@ configurations {
 }
 
 
-allprojects  {
+allprojects {
     group = 'cn.mbdoge.jyx'
 
     repositories {
@@ -34,26 +34,8 @@ allprojects  {
 
 subprojects {
 
-    apply from: "${rootDir}/mvn-push.gradle"
-//    apply plugin: 'io.spring.dependency-management'
-//    version = "$springBootVersion-82"
     test {
         useJUnitPlatform()
     }
-
-
-
-//    uploadArchives {
-//        repositories {
-//            //mavenDeployer 需要依赖 apply plugin: 'maven'
-//            mavenDeployer   {
-//                repository(url: localRepositoryPath)
-//                pom.project {
-//                    name = project.name
-//                    version = project.version
-//                    groupId = project.group
-//                }
-//            }
-//        }
-//    }
 }
+apply from: "mvn-push.gradle"
