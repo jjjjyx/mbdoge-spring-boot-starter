@@ -141,8 +141,23 @@ public final class IpUtils {
      * @throws AnalyzeIpGeoException 查询失败
      */
     public static IpGeoVO queryIpGeoByApi(InetAddress ipAddress) throws AnalyzeIpGeoException {
-
         return queryIpGeoByApi(ipAddress, "zh-CN");
+    }
+
+    /**
+     * 查询ip的地理位置 ，默认返回中文
+     * @param ipAddress ip
+     * @param fields int
+     * @return 地理位置
+     * @throws AnalyzeIpGeoException 查询失败
+     */
+    public static IpGeoVO queryIpGeoByApi(InetAddress ipAddress, int fields) throws AnalyzeIpGeoException {
+        return queryIpGeoByApi(ipAddress, new HashMap<String, String>(2) {
+            {
+                put("lang", "zh-CN");
+                put("fields", String.valueOf(fields));
+            }
+        });
     }
 
     /**
@@ -154,31 +169,54 @@ public final class IpUtils {
      */
     public static IpGeoVO queryIpGeoByApi(InetAddress ipAddress, String lang) throws AnalyzeIpGeoException {
 
-        if (internalIp(ipAddress)) {
-            throw new AnalyzeIpGeoException("private range");
-        }
-
-        try {
-            URL url = new URL(GEO_URL + ipAddress.getHostAddress() + "?lang=" + lang);
-            IpGeoVO geo = OBJECT_MAPPER.readValue(url, new TypeReference<IpGeoVO>() {});
-
-            if (QUERY_API_SUCCESS_FLAG.equals(geo.getStatus())) {
-                return geo;
+        return queryIpGeoByApi(ipAddress, new HashMap<String, String>(1) {
+            {
+                put("lang", lang);
             }
-        } catch (Exception e) {
-            log.trace("查询 ip = {} 地址信息失败请求api失败", ipAddress);
-            throw new AnalyzeIpGeoException(e);
-        }
-        throw new AnalyzeIpGeoException("private range");
+        });
+    }
+
+    /**
+     * 查询ip的地理位置 指定使用的语言
+     * @param ipAddress ip
+     * @param params 参数
+     * @return 地理位置
+     * @throws AnalyzeIpGeoException 查询失败
+     */
+    public static IpGeoVO queryIpGeoByApi(InetAddress ipAddress, Map<String, String> params) throws AnalyzeIpGeoException {
+        return queryIpGeoByApi(params, ipAddress).stream().findFirst().orElseGet(() -> {
+            IpGeoVO vo = new IpGeoVO();
+            vo.setStatus("fail");
+            vo.setMessage("private range");
+            vo.setQuery(ipAddress.getHostAddress());
+            return vo;
+        });
+        // if (internalIp(ipAddress)) {
+        //     throw new AnalyzeIpGeoException("private range");
+        // }
+        //
+        // try {
+        //     URL url = new URL(GEO_URL + ipAddress.getHostAddress() + "?lang=" + lang);
+        //     IpGeoVO geo = OBJECT_MAPPER.readValue(url, new TypeReference<IpGeoVO>() {});
+        //
+        //     if (QUERY_API_SUCCESS_FLAG.equals(geo.getStatus())) {
+        //         return geo;
+        //     }
+        // } catch (Exception e) {
+        //     log.trace("查询 ip = {} 地址信息失败请求api失败", ipAddress);
+        //     throw new AnalyzeIpGeoException(e);
+        // }
+        // throw new AnalyzeIpGeoException("private range");
     }
 
     /**
      * 批量查询ip地址 自动过滤所有内网地址
      * @param ipAddress ip 列表
+     * @param params 参数
      * @return 地理位置列表
      * @throws AnalyzeIpGeoException api 请求失败
      */
-    public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress, String lang) throws AnalyzeIpGeoException {
+    public static List<IpGeoVO> queryIpGeoByApi(Map<String, String> params, InetAddress... ipAddress) throws AnalyzeIpGeoException {
         Objects.requireNonNull(ipAddress);
 
         List<String> ips = Stream.of(ipAddress).filter(i -> !internalIp(i)).map(InetAddress::getHostAddress).collect(Collectors.toList());
@@ -187,7 +225,11 @@ public final class IpUtils {
         }
         byte[] body = ("[\"" + String.join("\",\"", ips) + "\"]").getBytes(StandardCharsets.UTF_8);
         try {
-            URL realUrl = new URL(GEO_BATCH_URL + "?lang=" + lang);
+            StringBuilder query = new StringBuilder("?");
+            for (String s : params.keySet()) {
+                query.append(s).append("=").append(params.get(s));
+            }
+            URL realUrl = new URL(GEO_BATCH_URL + query);
             URLConnection connection = realUrl.openConnection();
             HttpURLConnection http = (HttpURLConnection) connection;
             http.setRequestMethod("POST");
@@ -218,8 +260,38 @@ public final class IpUtils {
      * @return 地理位置列表
      * @throws AnalyzeIpGeoException api 请求失败
      */
+    public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress, String lang) throws AnalyzeIpGeoException {
+        return queryIpGeoByApi(new HashMap<String, String>(1) {
+            {
+                put("lang", lang);
+            }
+        }, ipAddress);
+    }
+
+    /**
+     * 批量查询ip地址 自动过滤所有内网地址
+     * @param ipAddress ip 列表
+     * @return 地理位置列表
+     * @throws AnalyzeIpGeoException api 请求失败
+     */
     public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress) throws AnalyzeIpGeoException {
         return queryIpGeoByApi(ipAddress, "zh-CN");
+    }
+
+    /**
+     * 批量查询ip地址 自动过滤所有内网地址
+     * @param ipAddress ip 列表
+     * @param fields int @see https://ip-api.com/docs/api:batch generated fields
+     * @return 地理位置列表
+     * @throws AnalyzeIpGeoException api 请求失败
+     */
+    public static List<IpGeoVO> queryIpGeoByApi(InetAddress[] ipAddress, int fields) throws AnalyzeIpGeoException {
+        return queryIpGeoByApi(new HashMap<String, String>(2) {
+            {
+                put("lang", "zh-CN");
+                put("fields", String.valueOf(fields));
+            }
+        }, ipAddress);
     }
 
 

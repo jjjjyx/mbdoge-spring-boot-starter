@@ -1,6 +1,12 @@
 # mbdoge-spring-boot-starter
 适用于 spring boot 2.x 版本的starter ，用于快速创建web项目，内置了大量常用web配置，以及api加密功能
 
+# 2.4.0.86 版本
+* 新增
+    - ip 查询api 支持自定义字段
+    - DataLocalTime 工具类
+    - 前端传long 转DataLocalTime 转换类
+
 # 2.4.0.85 版本
 * 新增
     - Dispatch 的事件回调增加泛型支持
