@@ -1,5 +1,6 @@
 package cn.mbdoge.jyx.jwt.filter;
 
+import cn.mbdoge.jyx.web.util.IpUtils;
 import lombok.extern.slf4j.Slf4j;
 import cn.mbdoge.jyx.jwt.JwtTokenProvider;
 import cn.mbdoge.jyx.jwt.Constant;
@@ -60,7 +61,7 @@ public abstract class AbstractBearerAuthenticationFilterAdapter extends OncePerR
             if (userDetails != null) {
                 log.debug("user {} Authentication request for failed: {}",  userDetails.getUsername(), e.getMessage());
             } else {
-                log.debug("Authentication request for failed: {}", e.getMessage());
+                log.debug("remote addr: {}, Authentication request for failed: {}", IpUtils.getRequestRealAddress(request), e.getMessage());
             }
             SecurityContextHolder.clearContext();
             authenticationEntryPoint.commence(request, response, e);
