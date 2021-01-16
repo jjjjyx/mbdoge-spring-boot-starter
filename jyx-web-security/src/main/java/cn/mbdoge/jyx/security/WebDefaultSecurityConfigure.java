@@ -83,13 +83,9 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 使用 addAllow 防止覆盖掉用户的自定义设置
-        // fix: 2.4.0 不能使用 Credentials = true 设置  AllowOrigin = * 的问题
-        webSecurityProperties.getCorsAllowOrigin().forEach(configuration::addAllowedOrigin);
-        webSecurityProperties.getCorsAllowMethod().forEach(configuration::addAllowedMethod);
-        webSecurityProperties.getCorsAllowHeader().forEach(configuration::addAllowedHeader);
-        webSecurityProperties.getCorsExposedHeaders().forEach(configuration::addExposedHeader);
-
+        configuration.setAllowedOrigins(webSecurityProperties.getCorsAllowOrigin());
+        configuration.setAllowedMethods(webSecurityProperties.getCorsAllowMethod());
+        configuration.setAllowedHeaders(webSecurityProperties.getCorsAllowHeader());
         configuration.setAllowCredentials(webSecurityProperties.isCorsCredentials());
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

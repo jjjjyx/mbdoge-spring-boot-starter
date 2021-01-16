@@ -19,11 +19,11 @@ public class WebSecurityProperties {
      */
     private String secret = "secret1";
     private String corsUrl = "/api/**";
-    private List<String> corsAllowOrigin = new ArrayList<>();
+    private List<String> corsAllowOrigin = Collections.singletonList("*");
     private List<String> corsAllowMethod = Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH");
     private List<String> corsAllowHeader = Collections.singletonList("*");
     private List<String> corsExposedHeaders = Arrays.asList("Accept-Language", "Authorization", "Content-Disposition", "Content-Length");
-    private boolean corsCredentials = false;
+    private boolean corsCredentials = true;
     private String apiPrefix = "/api";
 
     private Jwt jwt = new Jwt();
