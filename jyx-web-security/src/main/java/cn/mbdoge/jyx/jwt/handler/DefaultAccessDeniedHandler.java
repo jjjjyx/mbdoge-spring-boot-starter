@@ -3,6 +3,7 @@ package cn.mbdoge.jyx.jwt.handler;
 import cn.mbdoge.jyx.web.encrypt.ApiEncrypt;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.model.RespResult;
+import cn.mbdoge.jyx.web.util.IpUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.MessageSourceAccessor;
@@ -41,7 +42,7 @@ public class DefaultAccessDeniedHandler implements AccessDeniedHandler {
 
         response.setContentType("application/json; charset=utf-8");
         // 访问了无权访问的接口
-        log.info("DefaultAccessDeniedHandler : message = {}, Exception = {}", e.getMessage(), e.getClass());
+        log.info("remote addr: {}, DefaultAccessDeniedHandler : message = {}, Exception = {}", IpUtils.getRequestRealAddress(request), e.getMessage(), e.getClass());
         String ret = e.getMessage();
 
         PrintWriter out = response.getWriter();

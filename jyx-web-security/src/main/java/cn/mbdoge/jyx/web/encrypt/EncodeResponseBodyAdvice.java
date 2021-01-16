@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 /**
  * @author jyx
@@ -56,7 +57,7 @@ public class EncodeResponseBodyAdvice implements ResponseBodyAdvice<Object> {
             }
             log.trace("对方法 api 请求 = {} 返回的数据进行加密", req.getServletPath());
 
-            String resp = apiEncrypt.encryptObj(obj);
+            String resp = Optional.ofNullable(obj).map(apiEncrypt::encryptObj).orElse("");
             // String 类型会使用StringHttpMessageConverter 这将会丢失 ""
             if (obj instanceof String) {
                 resp = "\"" + resp + "\"";
