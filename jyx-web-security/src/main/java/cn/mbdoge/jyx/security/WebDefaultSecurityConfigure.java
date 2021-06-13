@@ -1,8 +1,6 @@
 package cn.mbdoge.jyx.security;
 
 
-
-
 import cn.mbdoge.jyx.jwt.filter.AbstractBearerAuthenticationFilterAdapter;
 import cn.mbdoge.jyx.jwt.handler.AccessExceptionAdvice;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
@@ -42,6 +40,7 @@ import java.util.Collections;
  * 比如，保存 token
  * 验证用户
  * redis
+ *
  * @author jyx
  */
 @Slf4j
@@ -62,6 +61,12 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Autowired
     private ConfigureWebSecurity configureWebSecurity;
 
+    // @Autowired
+    // private ConfigureAuthenticationManager[] configureAuthenticationManagers;
+
+    @Autowired
+    private ConfigureAuthenticationManager configureAuthenticationManager;
+
     @Autowired
     private AccessDeniedHandler accessDeniedHandler;
 
@@ -71,13 +76,21 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     @Autowired
     private AbstractBearerAuthenticationFilterAdapter abstractBearerAuthenticationFilterAdapter;
 
-    @Autowired @Qualifier("customDaoAuthenticationProvider")
-    private DaoAuthenticationProvider customDaoAuthenticationProvider;
-
+    @Autowired
+    private DefaultDaoAuthenticationProvider defaultDaoAuthenticationProvider;
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(customDaoAuthenticationProvider);
+    protected void configure(AuthenticationManagerBuilder auth) {
+        if (configureAuthenticationManager != null) {
+            configureAuthenticationManager.configure(auth);
+        }
+
+        auth.authenticationProvider(defaultDaoAuthenticationProvider);
+        // if (configureAuthenticationManagers != null) {
+        //     for (ConfigureAuthenticationManager configureAuthenticationManager : configureAuthenticationManagers) {
+        //         configureAuthenticationManager.configure(auth);
+        //     }
+        // }
     }
 
     public CorsConfigurationSource corsConfigurationSource() {
@@ -105,7 +118,7 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        if (configureWebSecurity!=null) {
+        if (configureWebSecurity != null) {
             configureWebSecurity.configure(web);
         }
     }
@@ -129,7 +142,7 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
 //                // 由于使用的是JWT，我们这里不需要 csrf
 //                .csrf().disable();
 
-        if (configureHttpSecurity!=null) {
+        if (configureHttpSecurity != null) {
             configureHttpSecurity.configure(httpSecurity);
         }
         httpSecurity.exceptionHandling()
@@ -138,7 +151,7 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
         httpSecurity.cors().configurationSource(corsConfigurationSource());
 
         httpSecurity.csrf().disable();
-        if (abstractBearerAuthenticationFilterAdapter !=null) {
+        if (abstractBearerAuthenticationFilterAdapter != null) {
             httpSecurity.addFilterBefore(abstractBearerAuthenticationFilterAdapter, UsernamePasswordAuthenticationFilter.class);
         }
 
@@ -146,7 +159,8 @@ public class WebDefaultSecurityConfigure extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationManager customAuthenticationManager() throws Exception {
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManager();
     }
 }

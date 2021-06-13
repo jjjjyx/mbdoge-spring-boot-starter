@@ -17,12 +17,9 @@ import java.util.Locale;
 /**
  * @author jyx
  */
-public class CustomDaoAuthenticationProvider extends DaoAuthenticationProvider {
+public class DefaultDaoAuthenticationProvider extends DaoAuthenticationProvider {
 
-    public CustomDaoAuthenticationProvider(MessageSource messageSource,
-            PasswordEncoder passwordEncoder,
-            UserDetailsService userDetailsService
-    ) {
+    public DefaultDaoAuthenticationProvider(PasswordEncoder passwordEncoder, UserDetailsService userDetailsService) {
 //        this.messages = new MessageSourceAccessor(messageSource);
         this.setPasswordEncoder(passwordEncoder);
         this.setUserDetailsService(userDetailsService);

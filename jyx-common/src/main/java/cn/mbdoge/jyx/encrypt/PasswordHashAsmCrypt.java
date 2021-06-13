@@ -24,7 +24,7 @@ public final class PasswordHashAsmCrypt {
 
     private static final Pattern HEX_PATTERN= Pattern.compile(".{2}");
     /**
-     * 加密前缀 v10
+     * 加密前缀 v01
       */
     private static final byte[] PREFIX = new byte[]{ 118, 48, 49 };
 

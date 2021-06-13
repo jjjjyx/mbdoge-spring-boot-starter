@@ -1,6 +1,17 @@
 # mbdoge-spring-boot-starter
 适用于 spring boot 2.x 版本的starter ，用于快速创建web项目，内置了大量常用web配置，以及api加密功能
 
+# 2.4.0.90 版本
+* 修复
+    - ip 工具类屏蔽ip 方法
+* 优化
+    - WebDefaultSecurityConfigure 能够自定义 AuthenticationProvider
+    - bean 的写法与方法名称
+
+# 2.4.0.90 版本
+* 修复
+    - 一些错误 （忘记了）
+
 # 2.4.0.87 版本
 * 修复
     - ip 工具类获取ip 的顺序， 改为先读取 X-Real-IP

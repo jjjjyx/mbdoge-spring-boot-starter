@@ -35,7 +35,7 @@ public final class IpUtils {
     private IpUtils() {}
 
     public static String shieldIp(String ip) {
-        if (StringUtils.hasText(ip)) {
+        if (!StringUtils.hasText(ip)) {
             return "";
         }
         String[] arr = ip.split("\\.");

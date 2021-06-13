@@ -7,6 +7,7 @@ import cn.mbdoge.jyx.web.encrypt.ApiEncrypt;
 import cn.mbdoge.jyx.web.encrypt.ApiEncryptProperties;
 import cn.mbdoge.jyx.web.encrypt.DefaultApiAesEncrypt;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,6 +17,11 @@ import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
@@ -23,6 +29,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
  * @author jyx
  */
 @Configurable
+@Slf4j
 public class RelatedBeanConfigure {
     @Autowired
     private WebSecurityProperties webSecurityProperties;
@@ -52,6 +59,21 @@ public class RelatedBeanConfigure {
         return new JwtTokenProvider(webSecurityProperties, redisTemplate, messageSourceAccessor);
     }
 
+    @Bean("userDetailsServiceImpl")
+    @ConditionalOnMissingBean(value = UserDetailsService.class, name = "userDetailsServiceImpl")
+    public UserDetailsService userDetailsService() {
+        log.warn("Please override the default UserDetailsService！");
+        return (username) -> {
+            throw new UsernameNotFoundException(String.format("No user found with username '%s'.", username));
+        };
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(PasswordEncoder.class)
+    public PasswordEncoder passwordEncoder() {
+        return new Pbkdf2PasswordEncoder(webSecurityProperties.getSecret());
+    }
+
     @Bean
     @ConditionalOnMissingBean(AuthenticationEntryPoint.class)
     public AuthenticationEntryPoint authenticationEntryPoint (ApiEncrypt apiEncrypt, MessageSourceAccessor messageSourceAccessor) {
@@ -69,5 +91,4 @@ public class RelatedBeanConfigure {
     public ApiEncrypt apiEncrypt () {
         return new DefaultApiAesEncrypt(apiEncryptProperties, objectMapper);
     }
-
 }
