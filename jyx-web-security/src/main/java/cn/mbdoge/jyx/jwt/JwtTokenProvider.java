@@ -39,10 +39,15 @@ public class JwtTokenProvider {
         this.secret = Base64.getEncoder().encode(jwt.getSecret().getBytes());
     }
     public Set<String> getUserOnlineList(UserDetails userDetails) {
-        String username = userDetails.getUsername();
+        return getUserOnlineList(userDetails.getUsername());
+    }
+
+    public Set<String> getUserOnlineList(String username) {
         String key = getUserKey(username, "*");
         return redisTemplate.keys(key);
     }
+
+
 
     private void checkUserJitNumber (UserDetails userDetails) {
         log.trace("checkUserJitNumber jwt.getJitMax() = {} ", jwt.getJitMax());
@@ -107,6 +112,13 @@ public class JwtTokenProvider {
         String key = getUserKey(username, id);
         redisTemplate.delete(key);
 //        SecurityContextHolder.clearContext();
+    }
+
+    public void clearUser (String username) {
+        for (String key : getUserOnlineList(username)) {
+            log.trace("clearUser [{}] = {}", username, key);
+            redisTemplate.delete(key);
+        }
     }
 
     public void refreshUser (UserDetails userDetails, String id) {
