@@ -47,7 +47,7 @@ public final class SecurityUtils {
         return hasRole(getUser(), role);
     }
 
-    public static boolean hasRole(User user,String role){
+    public static boolean hasRole(UserDetails user,String role){
         if (user == null || role == null) {
             return false;
         }
@@ -68,9 +68,6 @@ public final class SecurityUtils {
     }
 
     public static boolean hasAnyRoles(User user, String... roles) {
-        if (roles.length == 0) {
-            return false;
-        }
         for (String role : roles) {
             boolean b = hasRole(user, role);
             if (b) {

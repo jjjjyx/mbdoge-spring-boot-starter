@@ -3,16 +3,13 @@ package cn.mbdoge.jyx.jwt;
 import cn.mbdoge.jyx.security.WebSecurityProperties;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 
 
 import java.util.*;
@@ -111,7 +108,6 @@ public class JwtTokenProvider {
         String username = userDetails.getUsername();
         String key = getUserKey(username, id);
         redisTemplate.delete(key);
-//        SecurityContextHolder.clearContext();
     }
 
     public void clearUser (String username) {
@@ -127,7 +123,6 @@ public class JwtTokenProvider {
 
         ValueOperations<String, Object> operation = redisTemplate.opsForValue();
         operation.set(key, userDetails);
-//        SecurityContextHolder.clearContext();
     }
 
 
@@ -147,7 +142,7 @@ public class JwtTokenProvider {
             throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "凭证已过期"));
         }
 
-        User userDetails = (User) redisTemplate.opsForValue().get(key);
+        UserDetails userDetails = (UserDetails) redisTemplate.opsForValue().get(key);
         if (userDetails == null) {
             log.debug("用户提交token 解析成功，但是在redis 中不存在，判定失效");
             throw new CredentialsExpiredException(message.getMessage("AccountStatusUserDetailsChecker.credentialsExpired", "凭证已过期"));
