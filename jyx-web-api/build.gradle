@@ -10,8 +10,8 @@ bootJar { enabled = false }
 jar { enabled = true }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-autoconfigure'
-    compile 'org.springframework.boot:spring-boot-starter-validation'
+    api 'org.springframework.boot:spring-boot-autoconfigure'
+    api 'org.springframework.boot:spring-boot-starter-validation'
 
     api project(':jyx-common')
     api 'org.springframework.boot:spring-boot-starter-web'
